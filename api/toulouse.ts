@@ -1,6 +1,5 @@
 import { create } from "axios";
 
-import { enrichEventsWithOpenAgenda } from "@/api/openAgenda";
 import { EVENTS_PAGE_SIZE } from "@/constants/query";
 import type { EventItem, EventsPage, EventsResponse, ToulouseEventRecord } from "@/types/event";
 import { formatEventDateLabel } from "@/utils/events";
@@ -19,7 +18,7 @@ export async function fetchEvents(offset = 0, limit = EVENTS_PAGE_SIZE): Promise
     },
   });
 
-  const items = await enrichEventsWithOpenAgenda(response.data.results.map(mapRecordToEventItem));
+  const items = response.data.results.map(mapRecordToEventItem);
   const nextOffset = offset + limit < response.data.total_count ? offset + limit : null;
 
   return {
@@ -43,9 +42,7 @@ export async function fetchEventById(eventId: string): Promise<EventItem> {
     throw new Error("Evenement introuvable.");
   }
 
-  const [enrichedEvent] = await enrichEventsWithOpenAgenda([mapRecordToEventItem(selectedRecord)]);
-
-  return enrichedEvent;
+  return mapRecordToEventItem(selectedRecord);
 }
 
 function mapRecordToEventItem(record: ToulouseEventRecord): EventItem {

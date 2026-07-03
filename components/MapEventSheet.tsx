@@ -56,7 +56,14 @@ export function MapEventSheet({
           onPress={onOpenDirections}
         >
           <Ionicons name="navigate" size={16} color="#FFFFFF" />
-          <Text className="text-sm font-semibold text-white">Y aller</Text>
+          <Text
+            allowFontScaling={false}
+            adjustsFontSizeToFit
+            numberOfLines={1}
+            className="text-sm font-semibold text-white"
+          >
+            Y aller
+          </Text>
         </Pressable>
 
         <View className="flex-row gap-3">
@@ -65,14 +72,18 @@ export function MapEventSheet({
             onPress={onOpenDetails}
           >
             <Ionicons name="eye-outline" size={16} color="#1D4ED8" />
-            <Text className="text-sm font-semibold text-blue-700">Voir la fiche</Text>
+            <Text allowFontScaling={false} className="text-sm font-semibold text-blue-700">
+              Voir la fiche
+            </Text>
           </Pressable>
           <Pressable
             className="min-h-[52px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-rose-50 px-4 py-3"
             onPress={onShare}
           >
             <Ionicons name="share-social-outline" size={16} color="#BE185D" />
-            <Text className="text-sm font-semibold text-rose-700">Partager</Text>
+            <Text allowFontScaling={false} className="text-sm font-semibold text-rose-700">
+              Partager
+            </Text>
           </Pressable>
         </View>
       </View>

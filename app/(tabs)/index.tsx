@@ -7,6 +7,7 @@ import { EventRailCard } from "@/components/EventRailCard";
 import { FilterBar } from "@/components/FilterBar";
 import { Footer } from "@/components/Footer";
 import { HeroEventCarousel } from "@/components/HeroEventCarousel";
+import { HomeFeedSkeleton } from "@/components/HomeFeedSkeleton";
 import { ScreenState } from "@/components/ScreenState";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useEvents } from "@/hooks/useEvents";
@@ -47,13 +48,7 @@ export default function HomeScreen() {
   const categoryShelves = useMemo(() => buildCategoryShelves(rankedEvents), [rankedEvents]);
 
   if (eventsQuery.isPending && loadedEvents.length === 0) {
-    return (
-      <ScreenState
-        title="Chargement des sorties"
-        description="NocTou recupere l'agenda culturel de Toulouse."
-        isLoading
-      />
-    );
+    return <HomeFeedSkeleton />;
   }
 
   if (eventsQuery.isError && loadedEvents.length === 0) {

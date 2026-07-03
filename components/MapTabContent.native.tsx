@@ -1,7 +1,6 @@
 import { Stack, router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Alert,
   FlatList,
   Linking,
   Platform,
@@ -31,6 +30,7 @@ const toulouseRegion = {
 export default function MapTabContent() {
   const eventsQuery = useEvents();
   const { width } = useWindowDimensions();
+  const mapViewRef = useRef<MapView>(null);
   const cardsCarouselRef = useRef<FlatList<EventItem>>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null | undefined>(undefined);
 
@@ -53,26 +53,13 @@ export default function MapTabContent() {
 
     return mapEvents[0] ?? null;
   }, [mapEvents, selectedEventId]);
-  const selectedEventIndex = useMemo(
-    () => (selectedEvent ? mapEvents.findIndex((eventItem) => eventItem.id === selectedEvent.id) : -1),
-    [mapEvents, selectedEvent],
-  );
-  const carouselCardWidth = Math.max(width - 56, 300);
+  const carouselCardWidth = Math.max(width - 32, 300);
 
   useEffect(() => {
     if (selectedEventId === undefined && mapEvents[0]) {
       setSelectedEventId(mapEvents[0].id);
     }
   }, [mapEvents, selectedEventId]);
-
-  useEffect(() => {
-    if (selectedEventIndex >= 0) {
-      cardsCarouselRef.current?.scrollToIndex({
-        index: selectedEventIndex,
-        animated: true,
-      });
-    }
-  }, [selectedEventIndex]);
 
   if (eventsQuery.isPending && loadedEvents.length === 0) {
     return (
@@ -118,6 +105,7 @@ export default function MapTabContent() {
       />
 
       <MapView
+        ref={mapViewRef}
         initialRegion={toulouseRegion}
         style={{ flex: 1 }}
         onPress={() => {
@@ -128,15 +116,35 @@ export default function MapTabContent() {
       >
         {mapEvents.map((eventItem) => (
           <Marker
-            key={eventItem.id}
+            key={`${eventItem.id}-${selectedEvent?.id === eventItem.id ? "selected" : "default"}`}
             coordinate={{
               latitude: eventItem.coordinates!.latitude,
               longitude: eventItem.coordinates!.longitude,
             }}
-            pinColor={selectedEvent?.id === eventItem.id ? "#0F172A" : "#2563EB"}
+            pinColor={selectedEvent?.id === eventItem.id ? "#EF4444" : "#2563EB"}
             title={eventItem.title}
             description={eventItem.venueName}
-            onPress={() => setSelectedEventId(eventItem.id)}
+            onPress={() => {
+              setSelectedEventId(eventItem.id);
+              mapViewRef.current?.animateToRegion(
+                {
+                  latitude: eventItem.coordinates!.latitude,
+                  longitude: eventItem.coordinates!.longitude,
+                  latitudeDelta: 0.06,
+                  longitudeDelta: 0.06,
+                },
+                350,
+              );
+
+              const nextIndex = mapEvents.findIndex((listedEvent) => listedEvent.id === eventItem.id);
+
+              if (nextIndex >= 0) {
+                cardsCarouselRef.current?.scrollToIndex({
+                  index: nextIndex,
+                  animated: true,
+                });
+              }
+            }}
           />
         ))}
       </MapView>
@@ -160,7 +168,7 @@ export default function MapTabContent() {
             horizontal
             keyExtractor={(eventItem) => `map-card-${eventItem.id}`}
             renderItem={({ item }) => (
-              <View style={{ width: carouselCardWidth, marginLeft: 16, marginRight: 4 }}>
+              <View style={{ width: carouselCardWidth, marginRight: 12 }}>
                 <MapEventSheet
                   eventItem={item}
                   onOpenDetails={() => router.push(`/event/${item.id}`)}
@@ -174,16 +182,30 @@ export default function MapTabContent() {
               </View>
             )}
             pagingEnabled
-            snapToInterval={carouselCardWidth + 4}
+            snapToInterval={carouselCardWidth + 12}
             decelerationRate="fast"
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 16 }}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+            getItemLayout={(_, index) => ({
+              length: carouselCardWidth + 12,
+              offset: (carouselCardWidth + 12) * index,
+              index,
+            })}
             onMomentumScrollEnd={(event) => {
-              const nextIndex = getCarouselIndex(event, carouselCardWidth + 4);
+              const nextIndex = getCarouselIndex(event, carouselCardWidth + 12);
               const nextEvent = mapEvents[nextIndex];
 
               if (nextEvent) {
                 setSelectedEventId(nextEvent.id);
+                mapViewRef.current?.animateToRegion(
+                  {
+                    latitude: nextEvent.coordinates!.latitude,
+                    longitude: nextEvent.coordinates!.longitude,
+                    latitudeDelta: 0.06,
+                    longitudeDelta: 0.06,
+                  },
+                  350,
+                );
               }
             }}
           />
@@ -215,52 +237,19 @@ async function openDirectionsChoice(eventItem: EventItem) {
     }
   }
 
-  const navigationButtons =
-    Platform.OS === "ios"
-      ? [
-          {
-            text: "Plans",
-            onPress: () => {
-              void Linking.openURL(appleMapsUrl);
-            },
-          },
-          {
-            text: "Waze",
-            onPress: () => {
-              void Linking.openURL(wazeUrl);
-            },
-          },
-          {
-            text: "Google Maps",
-            onPress: () => {
-              void Linking.openURL(googleMapsUrl);
-            },
-          },
-          {
-            text: "Annuler",
-            style: "cancel" as const,
-          },
-        ]
-      : [
-          {
-            text: "Waze",
-            onPress: () => {
-              void Linking.openURL(wazeUrl);
-            },
-          },
-          {
-            text: "Google Maps",
-            onPress: () => {
-              void Linking.openURL(googleMapsUrl);
-            },
-          },
-          {
-            text: "Annuler",
-            style: "cancel" as const,
-          },
-        ];
+  if (Platform.OS === "ios") {
+    await Linking.openURL(appleMapsUrl);
+    return;
+  }
 
-  Alert.alert("Y aller", "Choisissez votre application de navigation.", navigationButtons);
+  const canOpenGoogleMaps = await Linking.canOpenURL(googleMapsUrl);
+
+  if (canOpenGoogleMaps) {
+    await Linking.openURL(googleMapsUrl);
+    return;
+  }
+
+  await Linking.openURL(wazeUrl);
 }
 
 async function shareEvent(eventItem: EventItem) {
