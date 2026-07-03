@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
 import type { EventItem } from "@/types/event";
@@ -50,21 +51,27 @@ export function MapEventSheet({
       </View>
 
       <View className="mt-4 gap-3">
-        <Pressable className="items-center rounded-full bg-slate-950 px-4 py-3" onPress={onOpenDirections}>
+        <Pressable
+          className="min-h-[52px] flex-row items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-3"
+          onPress={onOpenDirections}
+        >
+          <Ionicons name="navigate" size={16} color="#FFFFFF" />
           <Text className="text-sm font-semibold text-white">Y aller</Text>
         </Pressable>
 
         <View className="flex-row gap-3">
           <Pressable
-            className="flex-1 items-center rounded-full bg-blue-50 px-4 py-3"
+            className="min-h-[52px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-blue-50 px-4 py-3"
             onPress={onOpenDetails}
           >
+            <Ionicons name="eye-outline" size={16} color="#1D4ED8" />
             <Text className="text-sm font-semibold text-blue-700">Voir la fiche</Text>
           </Pressable>
           <Pressable
-            className="flex-1 items-center rounded-full bg-rose-50 px-4 py-3"
+            className="min-h-[52px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-rose-50 px-4 py-3"
             onPress={onShare}
           >
+            <Ionicons name="share-social-outline" size={16} color="#BE185D" />
             <Text className="text-sm font-semibold text-rose-700">Partager</Text>
           </Pressable>
         </View>

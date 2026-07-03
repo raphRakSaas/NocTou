@@ -1,6 +1,17 @@
 import { Stack, router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { Alert, Linking, Share, Text, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  Linking,
+  Platform,
+  Share,
+  Text,
+  View,
+  useWindowDimensions,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 import { Footer } from "@/components/Footer";
@@ -19,6 +30,8 @@ const toulouseRegion = {
 
 export default function MapTabContent() {
   const eventsQuery = useEvents();
+  const { width } = useWindowDimensions();
+  const cardsCarouselRef = useRef<FlatList<EventItem>>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null | undefined>(undefined);
 
   const loadedEvents = useMemo(
@@ -40,12 +53,26 @@ export default function MapTabContent() {
 
     return mapEvents[0] ?? null;
   }, [mapEvents, selectedEventId]);
+  const selectedEventIndex = useMemo(
+    () => (selectedEvent ? mapEvents.findIndex((eventItem) => eventItem.id === selectedEvent.id) : -1),
+    [mapEvents, selectedEvent],
+  );
+  const carouselCardWidth = Math.max(width - 56, 300);
 
   useEffect(() => {
     if (selectedEventId === undefined && mapEvents[0]) {
       setSelectedEventId(mapEvents[0].id);
     }
   }, [mapEvents, selectedEventId]);
+
+  useEffect(() => {
+    if (selectedEventIndex >= 0) {
+      cardsCarouselRef.current?.scrollToIndex({
+        index: selectedEventIndex,
+        animated: true,
+      });
+    }
+  }, [selectedEventIndex]);
 
   if (eventsQuery.isPending && loadedEvents.length === 0) {
     return (
@@ -126,15 +153,38 @@ export default function MapTabContent() {
       </View>
 
       {selectedEvent ? (
-        <View className="absolute inset-x-0 bottom-28 px-4">
-          <MapEventSheet
-            eventItem={selectedEvent}
-            onOpenDetails={() => router.push(`/event/${selectedEvent.id}`)}
-            onOpenDirections={() => {
-              void openDirectionsChoice(selectedEvent);
-            }}
-            onShare={() => {
-              void shareEvent(selectedEvent);
+        <View className="absolute inset-x-0 bottom-28">
+          <FlatList
+            ref={cardsCarouselRef}
+            data={mapEvents}
+            horizontal
+            keyExtractor={(eventItem) => `map-card-${eventItem.id}`}
+            renderItem={({ item }) => (
+              <View style={{ width: carouselCardWidth, marginLeft: 16, marginRight: 4 }}>
+                <MapEventSheet
+                  eventItem={item}
+                  onOpenDetails={() => router.push(`/event/${item.id}`)}
+                  onOpenDirections={() => {
+                    void openDirectionsChoice(item);
+                  }}
+                  onShare={() => {
+                    void shareEvent(item);
+                  }}
+                />
+              </View>
+            )}
+            pagingEnabled
+            snapToInterval={carouselCardWidth + 4}
+            decelerationRate="fast"
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingRight: 16 }}
+            onMomentumScrollEnd={(event) => {
+              const nextIndex = getCarouselIndex(event, carouselCardWidth + 4);
+              const nextEvent = mapEvents[nextIndex];
+
+              if (nextEvent) {
+                setSelectedEventId(nextEvent.id);
+              }
             }}
           />
         </View>
@@ -150,27 +200,67 @@ async function openDirectionsChoice(eventItem: EventItem) {
 
   const latitude = eventItem.coordinates.latitude;
   const longitude = eventItem.coordinates.longitude;
+  const encodedLabel = encodeURIComponent(eventItem.venueName || eventItem.title);
+  const nativeGeoUrl = `geo:${latitude},${longitude}?q=${latitude},${longitude}(${encodedLabel})`;
+  const appleMapsUrl = `http://maps.apple.com/?daddr=${latitude},${longitude}`;
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
   const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
 
-  Alert.alert("Y aller", "Choisissez votre application de navigation.", [
-    {
-      text: "Waze",
-      onPress: () => {
-        void Linking.openURL(wazeUrl);
-      },
-    },
-    {
-      text: "Google Maps",
-      onPress: () => {
-        void Linking.openURL(googleMapsUrl);
-      },
-    },
-    {
-      text: "Annuler",
-      style: "cancel",
-    },
-  ]);
+  if (Platform.OS === "android") {
+    const canOpenNativeGeo = await Linking.canOpenURL(nativeGeoUrl);
+
+    if (canOpenNativeGeo) {
+      await Linking.openURL(nativeGeoUrl);
+      return;
+    }
+  }
+
+  const navigationButtons =
+    Platform.OS === "ios"
+      ? [
+          {
+            text: "Plans",
+            onPress: () => {
+              void Linking.openURL(appleMapsUrl);
+            },
+          },
+          {
+            text: "Waze",
+            onPress: () => {
+              void Linking.openURL(wazeUrl);
+            },
+          },
+          {
+            text: "Google Maps",
+            onPress: () => {
+              void Linking.openURL(googleMapsUrl);
+            },
+          },
+          {
+            text: "Annuler",
+            style: "cancel" as const,
+          },
+        ]
+      : [
+          {
+            text: "Waze",
+            onPress: () => {
+              void Linking.openURL(wazeUrl);
+            },
+          },
+          {
+            text: "Google Maps",
+            onPress: () => {
+              void Linking.openURL(googleMapsUrl);
+            },
+          },
+          {
+            text: "Annuler",
+            style: "cancel" as const,
+          },
+        ];
+
+  Alert.alert("Y aller", "Choisissez votre application de navigation.", navigationButtons);
 }
 
 async function shareEvent(eventItem: EventItem) {
@@ -185,4 +275,11 @@ async function shareEvent(eventItem: EventItem) {
     title: eventItem.title,
     message: parts.join("\n"),
   });
+}
+
+function getCarouselIndex(
+  event: NativeSyntheticEvent<NativeScrollEvent>,
+  itemWidth: number,
+): number {
+  return Math.round(event.nativeEvent.contentOffset.x / itemWidth);
 }
