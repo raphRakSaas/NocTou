@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 
 import { DestinationCard } from "@/components/DestinationCard";
 import { FilterBar } from "@/components/FilterBar";
@@ -14,6 +14,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useTheme } from "@/hooks/useTheme";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import type { EventItem } from "@/types/event";
 import {
   applyEventFilters,
   buildCategoryShelves,
@@ -28,10 +29,12 @@ function SectionHeader({
   eyebrow,
   title,
   actionLabel,
+  onActionPress,
 }: {
   eyebrow: string;
   title: string;
   actionLabel?: string;
+  onActionPress?: () => void;
 }) {
   const { colors } = useTheme();
 
@@ -45,7 +48,13 @@ function SectionHeader({
           {title}
         </Text>
       </View>
-      {actionLabel ? (
+      {actionLabel && onActionPress ? (
+        <Pressable hitSlop={8} onPress={onActionPress}>
+          <Text className="text-sm font-medium" style={{ color: colors.accentSoftText }}>
+            {actionLabel}
+          </Text>
+        </Pressable>
+      ) : actionLabel ? (
         <Text className="text-sm font-medium" style={{ color: colors.accentSoftText }}>
           {actionLabel}
         </Text>
@@ -57,6 +66,8 @@ function SectionHeader({
 export default function HomeScreen() {
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
+  const mainListRef = useRef<FlatList<EventItem>>(null);
+  const exploreSectionOffsetRef = useRef(0);
   const eventsQuery = useEvents();
   const { filters, resetFilters, setCategory, setDateFilter, setSelectedDate, setSortMode } = useEventFilters();
   const { isFavorite, isReady, toggleFavorite } = useFavorites();
@@ -106,6 +117,7 @@ export default function HomeScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <FlatList
+        ref={mainListRef}
         data={rankedEvents}
         keyExtractor={(eventItem) => eventItem.id}
         renderItem={({ item }) => (
@@ -166,6 +178,12 @@ export default function HomeScreen() {
                   eyebrow="Selection"
                   title="Sorties populaires"
                   actionLabel="Voir tout"
+                  onActionPress={() => {
+                    mainListRef.current?.scrollToOffset({
+                      offset: exploreSectionOffsetRef.current,
+                      animated: true,
+                    });
+                  }}
                 />
                 <FlatList
                   data={popularEvents}
@@ -229,7 +247,13 @@ export default function HomeScreen() {
               </View>
             ))}
 
-            <SectionHeader eyebrow="Explorer" title="Toutes les sorties" />
+            <View
+              onLayout={(event: LayoutChangeEvent) => {
+                exploreSectionOffsetRef.current = event.nativeEvent.layout.y;
+              }}
+            >
+              <SectionHeader eyebrow="Explorer" title="Toutes les sorties" />
+            </View>
           </View>
         }
         ListEmptyComponent={

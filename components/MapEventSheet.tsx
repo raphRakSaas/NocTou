@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
+import { resolveEventImage } from "@/utils/eventImages";
 
 interface MapEventSheetProps {
   eventItem: EventItem;
@@ -24,8 +24,7 @@ export function MapEventSheet({
   onShare,
 }: MapEventSheetProps) {
   const { colors, isDark } = useTheme();
-  const heroImageUrl =
-    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: heroImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
   const previewDate = formatEventPreviewDate(eventItem);
   const cardShadowStyle = isDark
     ? {
@@ -77,6 +76,11 @@ export function MapEventSheet({
         <Text className="mt-1 text-sm" style={{ color: colors.textMuted }} numberOfLines={1}>
           {eventItem.venueName}
         </Text>
+        {isIllustrativeFallback ? (
+          <Text className="mt-1 text-[10px] italic" style={{ color: colors.textMuted }}>
+            Photo illustrative
+          </Text>
+        ) : null}
         <View className="mt-2 flex-row flex-wrap items-center gap-2">
           <View
             className="flex-row items-center gap-1 rounded-full px-2.5 py-1"

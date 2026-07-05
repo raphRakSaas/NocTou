@@ -116,6 +116,41 @@ Pour refaire un APK partageable autonome :
 npm exec --yes eas-cli -- build --platform android --profile preview
 ```
 
+## Site vitrine (Next.js)
+
+Le depot contient aussi un site vitrine dans `website/` (Next.js + Tailwind),
+qui presente l'application, raconte le projet et propose le telechargement.
+
+```bash
+cd website
+npm install
+npm run dev
+```
+
+Voir `website/README.md` pour le detail.
+
+## Deploiement Vercel (monorepo)
+
+Ce depot GitHub heberge deux projets deployables independamment sur Vercel,
+a partir du meme repo :
+
+1. **Site vitrine** (`website/`)
+   - Nouveau projet Vercel -> Import depuis GitHub -> selectionner ce repo
+   - **Root Directory** : `website`
+   - Framework : Next.js (detecte automatiquement)
+   - Aucune variable d'environnement requise pour demarrer
+
+2. **Application web** (export Expo, a la racine du repo)
+   - Nouveau projet Vercel (deuxieme projet) -> meme repo GitHub
+   - **Root Directory** : `.` (racine)
+   - Framework preset : `Other`
+   - **Build command** : `npm run build:web` (execute `expo export --platform web`)
+   - **Output directory** : `dist`
+   - Variable d'environnement `OPEN_AGENDA_API_KEY` si utilisee
+
+Une fois les deux projets crees, chaque `git push` sur la branche principale
+redeploie automatiquement le site vitrine et l'application web en parallele.
+
 ## Structure
 
 - `app/` : ecrans Expo Router

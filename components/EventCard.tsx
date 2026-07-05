@@ -1,9 +1,10 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { EventImageWithBadge } from "@/components/EventImageWithBadge";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatDistance } from "@/utils/events";
+import { resolveEventImage } from "@/utils/eventImages";
 
 interface EventCardProps {
   eventItem: EventItem;
@@ -21,8 +22,7 @@ export function EventCard({
   onToggleFavorite,
 }: EventCardProps) {
   const { colors } = useTheme();
-  const cardImageUrl =
-    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: cardImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
 
   return (
     <View
@@ -31,11 +31,11 @@ export function EventCard({
     >
       <Pressable onPress={onPress}>
         <View>
-          <Image
-            source={{ uri: cardImageUrl }}
-            resizeMode="cover"
+          <EventImageWithBadge
+            imageUrl={cardImageUrl}
+            isIllustrativeFallback={isIllustrativeFallback}
+            imageStyle={{ width: "100%", height: 208 }}
             fadeDuration={120}
-            style={{ width: "100%", height: 208 }}
           />
           <View className="absolute inset-x-0 bottom-0 bg-black/40 px-5 py-4">
             <Text className="text-xs font-semibold uppercase tracking-wide text-white/85">

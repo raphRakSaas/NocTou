@@ -24,7 +24,7 @@ function FavoritesBackButton() {
       className="h-9 w-9 items-center justify-center rounded-full"
       hitSlop={8}
       style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
-      onPress={() => router.navigate("/(tabs)/")}
+      onPress={() => router.navigate("/")}
     >
       <Ionicons name="chevron-back" size={20} color={colors.text} />
     </Pressable>

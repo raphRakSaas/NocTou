@@ -1,7 +1,40 @@
 import type { Coordinates, EventFilters, EventItem, EventsPage } from "@/types/event";
 
 export function flattenEventPages(pages: EventsPage[] | undefined): EventItem[] {
-  return pages?.flatMap((page) => page.items) ?? [];
+  const allItems = pages?.flatMap((page) => page.items) ?? [];
+  const uniqueItems = deduplicateEventsById(allItems);
+
+  return uniqueItems.filter((eventItem) => !isEventFinished(eventItem));
+}
+
+export function deduplicateEventsById(items: EventItem[]): EventItem[] {
+  const seenEventIds = new Set<string>();
+  const uniqueItems: EventItem[] = [];
+
+  for (const item of items) {
+    if (seenEventIds.has(item.id)) {
+      continue;
+    }
+
+    seenEventIds.add(item.id);
+    uniqueItems.push(item);
+  }
+
+  return uniqueItems;
+}
+
+export function isEventFinished(eventItem: EventItem, referenceDate: Date = new Date()): boolean {
+  const eventDates = collectEventDates(eventItem);
+
+  if (eventDates.length === 0) {
+    return false;
+  }
+
+  const latestEventDate = eventDates.reduce((latestDate, currentDate) =>
+    currentDate > latestDate ? currentDate : latestDate,
+  );
+
+  return latestEventDate < startOfDay(referenceDate);
 }
 
 export function splitCategories(category: string): string[] {

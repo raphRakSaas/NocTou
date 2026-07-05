@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { EventImageWithBadge } from "@/components/EventImageWithBadge";
 import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatDistance, formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
+import { resolveEventImage } from "@/utils/eventImages";
 
 interface DestinationCardProps {
   eventItem: EventItem;
@@ -26,8 +27,7 @@ export function DestinationCard({
   variant = "portrait",
 }: DestinationCardProps) {
   const { colors } = useTheme();
-  const cardImageUrl =
-    eventItem.imageUrl ?? eventItem.imagePreviewUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: cardImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
   const cardWidth = variant === "portrait" ? 210 : undefined;
   const cardHeight = variant === "portrait" ? 300 : 280;
   const previewDate = formatEventPreviewDate(eventItem);
@@ -39,12 +39,11 @@ export function DestinationCard({
       onPress={onPress}
       accessibilityLabel={`${eventItem.title}, ${previewDate.label}, ${eventItem.venueName}`}
     >
-      <Image
-        source={{ uri: cardImageUrl }}
-        resizeMode="cover"
-        style={{ width: "100%", height: "100%" }}
-        accessibilityIgnoresInvertColors
-        importantForAccessibility="no"
+      <EventImageWithBadge
+        imageUrl={cardImageUrl}
+        isIllustrativeFallback={isIllustrativeFallback}
+        imageStyle={{ width: "100%", height: "100%" }}
+        fadeDuration={120}
       />
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.82)"]}

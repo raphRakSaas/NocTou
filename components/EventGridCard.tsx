@@ -1,9 +1,10 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { EventImageWithBadge } from "@/components/EventImageWithBadge";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatDistance, formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
+import { resolveEventImage } from "@/utils/eventImages";
 
 interface EventGridCardProps {
   eventItem: EventItem;
@@ -21,8 +22,7 @@ export function EventGridCard({
   onToggleFavorite,
 }: EventGridCardProps) {
   const { colors } = useTheme();
-  const cardImageUrl =
-    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: cardImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
 
   const previewDate = formatEventPreviewDate(eventItem);
 
@@ -32,11 +32,10 @@ export function EventGridCard({
       style={{ backgroundColor: colors.surface, borderColor: colors.border }}
     >
       <Pressable onPress={onPress}>
-        <Image
-          source={{ uri: cardImageUrl }}
-          resizeMode="cover"
-          fadeDuration={100}
-          style={{ width: "100%", height: 148 }}
+        <EventImageWithBadge
+          imageUrl={cardImageUrl}
+          isIllustrativeFallback={isIllustrativeFallback}
+          imageStyle={{ width: "100%", height: 148 }}
         />
 
         <View className="min-h-[136px] justify-between px-4 py-4">

@@ -1,14 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { EventImageWithBadge } from "@/components/EventImageWithBadge";
 import { SortiRoseLogo } from "@/components/SortiRoseLogo";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatLongDate } from "@/utils/events";
+import { illustrativeImageDisclaimer, resolveEventImage } from "@/utils/eventImages";
 
 const heroHeightRatio = 0.44;
 const sheetBorderRadius = 32;
@@ -31,8 +32,7 @@ export function EventDetailHero({
   const { colors, isDark } = useTheme();
   const safeAreaInsets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const heroImageUrl =
-    eventItem.imageUrl ?? eventItem.imagePreviewUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: heroImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
   const heroHeight = windowHeight * heroHeightRatio;
   const bottomInset = safeAreaInsets.bottom + 12;
 
@@ -47,10 +47,11 @@ export function EventDetailHero({
         showsVerticalScrollIndicator={false}
       >
         <View style={{ height: heroHeight }}>
-          <Image
-            source={{ uri: heroImageUrl }}
-            resizeMode="cover"
-            style={{ width: "100%", height: heroHeight }}
+          <EventImageWithBadge
+            imageUrl={heroImageUrl}
+            isIllustrativeFallback={isIllustrativeFallback}
+            badgeVariant="detail"
+            imageStyle={{ width: "100%", height: heroHeight }}
           />
           <LinearGradient
             colors={["transparent", isDark ? "rgba(23, 28, 36, 0.35)" : "rgba(255, 255, 255, 0.2)", colors.surface]}
@@ -102,6 +103,12 @@ export function EventDetailHero({
             <InfoChip colors={colors} icon="cash-outline" label={eventItem.price} />
             <InfoChip colors={colors} icon="location-outline" label={eventItem.city} />
           </View>
+
+          {isIllustrativeFallback ? (
+            <Text className="mt-4 text-xs leading-5" style={{ color: colors.textMuted }}>
+              {illustrativeImageDisclaimer}
+            </Text>
+          ) : null}
 
           <Text className="mt-6 text-sm font-semibold uppercase tracking-[0.16em]" style={{ color: colors.textMuted }}>
             Description

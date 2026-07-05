@@ -15,6 +15,7 @@ export async function fetchEvents(offset = 0, limit = EVENTS_PAGE_SIZE): Promise
     params: {
       limit,
       offset,
+      order_by: "date_debut",
     },
   });
 

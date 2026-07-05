@@ -1,8 +1,9 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { EventImageWithBadge } from "@/components/EventImageWithBadge";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
+import { resolveEventImage } from "@/utils/eventImages";
 
 interface EventRailCardProps {
   eventItem: EventItem;
@@ -11,8 +12,7 @@ interface EventRailCardProps {
 
 export function EventRailCard({ eventItem, onPress }: EventRailCardProps) {
   const { colors } = useTheme();
-  const railImageUrl =
-    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+  const { imageUrl: railImageUrl, isIllustrativeFallback } = resolveEventImage(eventItem);
 
   return (
     <Pressable
@@ -20,11 +20,10 @@ export function EventRailCard({ eventItem, onPress }: EventRailCardProps) {
       style={{ backgroundColor: colors.surface, borderColor: colors.border }}
       onPress={onPress}
     >
-      <Image
-        source={{ uri: railImageUrl }}
-        resizeMode="cover"
-        fadeDuration={100}
-        style={{ width: "100%", height: 152 }}
+      <EventImageWithBadge
+        imageUrl={railImageUrl}
+        isIllustrativeFallback={isIllustrativeFallback}
+        imageStyle={{ width: "100%", height: 152 }}
       />
 
       <View className="px-4 py-4">
