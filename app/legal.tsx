@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 
 const datasetUrl =
   "https://data.toulouse-metropole.fr/explore/dataset/agenda-des-manifestations-culturelles-so-toulouse/";
+const licenceUrl = "https://www.etalab.gouv.fr/wp-content/uploads/2014/05/Licence_Ouverte.pdf";
 
 export default function LegalScreen() {
   const { colors } = useTheme();
@@ -22,34 +23,75 @@ export default function LegalScreen() {
           Mentions legales
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          NocTou centralise les sorties culturelles de Toulouse a partir des donnees Open Data
-          publiques mises a disposition par Toulouse Metropole.
+          Conformement a l article 6-III de la loi n. 2004-575 du 21 juin 2004 pour la confiance
+          dans l economie numerique (LCEN), les presentes mentions legales identifient l editeur
+          de l application NocTou.
         </Text>
 
         <View className="mt-6 gap-4">
           <LegalBlock
             colors={colors}
+            title="Editeur de l'application"
+            description={
+              "[A COMPLETER] Raison sociale et forme juridique (ex. Plum, SASU au capital de ...), " +
+              "siege social : [A COMPLETER - adresse complete], SIRET : [A COMPLETER], " +
+              "contact : [A COMPLETER - email], telephone : [A COMPLETER]."
+            }
+          />
+          <LegalBlock
+            colors={colors}
+            title="Directeur de la publication"
+            description="[A COMPLETER] Nom et prenom de la personne responsable de la publication."
+          />
+          <LegalBlock
+            colors={colors}
+            title="Hebergement"
+            description="NocTou est distribuee via l'App Store (Apple Inc.) et le Google Play Store (Google Ireland Limited). L'application ne dispose pas de serveur propre : elle interroge directement, depuis l'appareil de l'utilisateur, les API publiques listees ci-dessous."
+          />
+          <LegalBlock
+            colors={colors}
+            title="Propriete intellectuelle"
+            description="La structure, le design, les textes et le code de l'application NocTou sont la propriete de l'editeur, sauf mention contraire. Les donnees d'evenements affichees restent la propriete de leurs producteurs respectifs (Toulouse Metropole, lieux culturels, organisateurs)."
+          />
+          <LegalBlock
+            colors={colors}
             title="Source des donnees"
-            description="Agenda des manifestations culturelles - So Toulouse, publie par Toulouse Metropole."
+            description="Agenda des manifestations culturelles - So Toulouse, publie en Open Data par Toulouse Metropole sous Licence Ouverte / Open Licence version 2.0 (Etalab). Cette licence autorise la reutilisation gratuite des donnees, sous reserve de mentionner leur source et leur date de derniere mise a jour, ce que fait NocTou sur chaque ecran listant des sorties."
+          />
+          <LegalBlock
+            colors={colors}
+            title="Enrichissement des visuels"
+            description="Certains visuels sont recuperes via l'API OpenAgenda ou, a defaut, extraits automatiquement de la page de reservation du site tiers indique par la source Open Data (recuperation de la miniature publique de la page). L'editeur ne revendique aucun droit sur ces visuels, qui restent la propriete de leurs auteurs ou des organisateurs des evenements. Toute demande de retrait d'un visuel peut etre adressee a [A COMPLETER - email de contact]."
           />
           <LegalBlock
             colors={colors}
             title="Usage"
-            description="Cette application ne modifie pas les donnees sources et n'agit que comme interface de consultation."
+            description="Cette application ne modifie pas les donnees sources et n'agit que comme interface de consultation. Elle ne garantit ni l'exactitude ni l'exhaustivite des informations affichees."
           />
           <LegalBlock
             colors={colors}
             title="Reservation"
-            description="Les liens de reservation renvoient vers les sites tiers fournis par la source Open Data lorsqu'ils sont disponibles."
+            description="Les liens de reservation renvoient vers des sites tiers independants de NocTou. L'editeur n'est pas partie aux transactions qui y sont effectuees et decline toute responsabilite quant a leur execution."
           />
         </View>
 
-        <Pressable
-          className="mt-8 items-center rounded-full bg-blue-700 px-5 py-4"
-          onPress={() => void Linking.openURL(datasetUrl)}
-        >
-          <Text className="font-semibold text-white">Ouvrir la page Open Data</Text>
-        </Pressable>
+        <View className="mt-6 flex-row gap-3">
+          <Pressable
+            className="flex-1 items-center rounded-full bg-blue-700 px-5 py-4"
+            onPress={() => void Linking.openURL(datasetUrl)}
+          >
+            <Text className="text-center font-semibold text-white">Page Open Data</Text>
+          </Pressable>
+          <Pressable
+            className="flex-1 items-center rounded-full px-5 py-4"
+            style={{ backgroundColor: colors.surfaceMuted, borderColor: colors.border, borderWidth: 1 }}
+            onPress={() => void Linking.openURL(licenceUrl)}
+          >
+            <Text className="text-center font-semibold" style={{ color: colors.text }}>
+              Texte de la licence
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <View className="mt-4">

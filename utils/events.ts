@@ -1,17 +1,19 @@
-import type {
-  Coordinates,
-  EventDateFilter,
-  EventFilters,
-  EventItem,
-  EventsPage,
-} from "@/types/event";
+import type { Coordinates, EventFilters, EventItem, EventsPage } from "@/types/event";
 
 export function flattenEventPages(pages: EventsPage[] | undefined): EventItem[] {
   return pages?.flatMap((page) => page.items) ?? [];
 }
 
+export function splitCategories(category: string): string[] {
+  return [...new Set(category.split(",").map((value) => value.trim()).filter(Boolean))];
+}
+
+export function getPrimaryCategory(category: string): string {
+  return splitCategories(category)[0] ?? category;
+}
+
 export function collectCategories(items: EventItem[]): string[] {
-  return [...new Set(items.map((item) => item.category).filter(Boolean))].sort((left, right) =>
+  return [...new Set(items.flatMap((item) => splitCategories(item.category)))].sort((left, right) =>
     left.localeCompare(right, "fr"),
   );
 }
@@ -67,11 +69,13 @@ export function buildCategoryShelves(items: EventItem[], maxShelves = 3): Catego
   const groupedItems = new Map<string, EventItem[]>();
 
   for (const item of items) {
-    if (!groupedItems.has(item.category)) {
-      groupedItems.set(item.category, []);
-    }
+    for (const category of splitCategories(item.category)) {
+      if (!groupedItems.has(category)) {
+        groupedItems.set(category, []);
+      }
 
-    groupedItems.get(item.category)?.push(item);
+      groupedItems.get(category)?.push(item);
+    }
   }
 
   return [...groupedItems.entries()]
@@ -243,7 +247,7 @@ function matchesCategory(item: EventItem, selectedCategory: string): boolean {
     return true;
   }
 
-  return item.category === selectedCategory;
+  return splitCategories(item.category).includes(selectedCategory);
 }
 
 function matchesDateFilter(item: EventItem, filters: EventFilters): boolean {

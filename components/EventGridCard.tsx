@@ -3,7 +3,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
-import { formatDistance, formatEventPreviewDate } from "@/utils/events";
+import { formatDistance, formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
 
 interface EventGridCardProps {
   eventItem: EventItem;
@@ -41,8 +41,12 @@ export function EventGridCard({
 
         <View className="min-h-[136px] justify-between px-4 py-4">
           <View>
-            <Text className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: colors.textMuted }}>
-              {eventItem.category}
+            <Text
+              className="text-[11px] font-semibold uppercase tracking-wide"
+              style={{ color: colors.textMuted }}
+              numberOfLines={1}
+            >
+              {getPrimaryCategory(eventItem.category)}
             </Text>
             <Text className="mt-2 text-base font-semibold leading-6" style={{ color: colors.text }} numberOfLines={2}>
               {eventItem.title}
@@ -82,6 +86,8 @@ export function EventGridCard({
               : colors.favoriteButton.inactiveBackground,
           }}
           onPress={onToggleFavorite}
+          accessibilityRole="button"
+          accessibilityLabel={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
           <Text
             className="text-sm font-semibold"

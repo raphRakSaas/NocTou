@@ -6,7 +6,7 @@ import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
-import { formatDistance, formatEventPreviewDate } from "@/utils/events";
+import { formatDistance, formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
 
 interface DestinationCardProps {
   eventItem: EventItem;
@@ -37,8 +37,15 @@ export function DestinationCard({
       className={`overflow-hidden rounded-[28px] ${variant === "portrait" ? "mr-4" : "mb-4"}`}
       style={{ width: cardWidth, height: cardHeight }}
       onPress={onPress}
+      accessibilityLabel={`${eventItem.title}, ${previewDate.label}, ${eventItem.venueName}`}
     >
-      <Image source={{ uri: cardImageUrl }} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+      <Image
+        source={{ uri: cardImageUrl }}
+        resizeMode="cover"
+        style={{ width: "100%", height: "100%" }}
+        accessibilityIgnoresInvertColors
+        importantForAccessibility="no"
+      />
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.82)"]}
         style={{ position: "absolute", inset: 0 }}
@@ -50,8 +57,8 @@ export function DestinationCard({
           style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
         >
           <Ionicons name={getCategoryIcon(eventItem.category)} size={12} color={colors.text} />
-          <Text className="text-[11px] font-semibold uppercase" style={{ color: colors.text }}>
-            {eventItem.category.slice(0, 14)}
+          <Text className="text-[11px] font-semibold uppercase" style={{ color: colors.text }} numberOfLines={1}>
+            {getPrimaryCategory(eventItem.category)}
           </Text>
         </View>
 
@@ -60,6 +67,8 @@ export function DestinationCard({
             className="h-9 w-9 items-center justify-center rounded-full"
             style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
             onPress={onToggleFavorite}
+            accessibilityRole="button"
+            accessibilityLabel={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
           >
             <Ionicons
               name={isFavorite ? "bookmark" : "bookmark-outline"}

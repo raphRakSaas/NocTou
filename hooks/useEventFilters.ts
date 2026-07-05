@@ -32,14 +32,7 @@ export function useEventFilters() {
         setFilters((currentFilters) => ({
           ...currentFilters,
           sortMode,
-          proximityEnabled: sortMode === "proximity" ? true : currentFilters.proximityEnabled,
-        }));
-      },
-      setProximityEnabled: (proximityEnabled: boolean) => {
-        setFilters((currentFilters) => ({
-          ...currentFilters,
-          proximityEnabled,
-          sortMode: proximityEnabled ? "proximity" : "date",
+          proximityEnabled: sortMode === "proximity",
         }));
       },
       resetFilters: () => {

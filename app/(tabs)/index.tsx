@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 import { DestinationCard } from "@/components/DestinationCard";
 import { FilterBar } from "@/components/FilterBar";
@@ -58,8 +58,7 @@ export default function HomeScreen() {
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const eventsQuery = useEvents();
-  const { filters, resetFilters, setCategory, setDateFilter, setProximityEnabled, setSelectedDate, setSortMode } =
-    useEventFilters();
+  const { filters, resetFilters, setCategory, setDateFilter, setSelectedDate, setSortMode } = useEventFilters();
   const { isFavorite, isReady, toggleFavorite } = useFavorites();
   const userLocation = useUserLocation(filters.proximityEnabled);
 
@@ -139,7 +138,6 @@ export default function HomeScreen() {
               onDateFilterChange={setDateFilter}
               onSelectedDateChange={setSelectedDate}
               onSortModeChange={setSortMode}
-              onProximityToggle={setProximityEnabled}
               onReset={resetFilters}
             />
 
@@ -244,19 +242,10 @@ export default function HomeScreen() {
         }
         ListFooterComponent={
           <View className="pt-2">
-            {eventsQuery.hasNextPage ? (
-              <Pressable
-                className="mb-4 items-center rounded-full px-5 py-4"
-                style={{ backgroundColor: colors.accent }}
-                disabled={eventsQuery.isFetchingNextPage}
-                onPress={() => void eventsQuery.fetchNextPage()}
-              >
-                {eventsQuery.isFetchingNextPage ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text className="font-semibold text-white">Charger plus de sorties</Text>
-                )}
-              </Pressable>
+            {eventsQuery.isFetchingNextPage ? (
+              <View className="mb-4 items-center py-4">
+                <ActivityIndicator size="small" color={colors.accent} />
+              </View>
             ) : null}
             <Footer />
           </View>

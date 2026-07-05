@@ -22,12 +22,9 @@ export function HomeTopBar() {
             <Text className="text-xs" style={{ color: colors.textMuted }}>
               Localisation
             </Text>
-            <View className="flex-row items-center gap-1">
-              <Text className="text-lg font-semibold" style={{ color: colors.text }}>
-                Toulouse
-              </Text>
-              <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
-            </View>
+            <Text className="text-lg font-semibold" style={{ color: colors.text }}>
+              Toulouse
+            </Text>
           </View>
         </View>
         <HeaderActions />

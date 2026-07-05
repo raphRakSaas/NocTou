@@ -4,7 +4,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
-import { formatEventPreviewDate } from "@/utils/events";
+import { formatEventPreviewDate, getPrimaryCategory } from "@/utils/events";
 
 interface MapEventSheetProps {
   eventItem: EventItem;
@@ -54,8 +54,12 @@ export function MapEventSheet({
 
       <View className="flex-1">
         <View className="flex-row items-start justify-between gap-2">
-          <Text className="flex-1 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: colors.textMuted }}>
-            {eventItem.category}
+          <Text
+            className="flex-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: colors.textMuted }}
+            numberOfLines={1}
+          >
+            {getPrimaryCategory(eventItem.category)}
           </Text>
           <Pressable
             accessibilityLabel={isExpanded ? "Reduire la carte" : "Afficher les actions"}

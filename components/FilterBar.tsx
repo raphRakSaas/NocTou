@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { EventDatePickerModal } from "@/components/EventDatePickerModal";
@@ -16,7 +17,6 @@ interface FilterBarProps {
   onDateFilterChange: (dateFilter: EventDateFilter) => void;
   onSelectedDateChange: (selectedDate: string | null) => void;
   onSortModeChange: (sortMode: EventSortMode) => void;
-  onProximityToggle: (isEnabled: boolean) => void;
   onReset: () => void;
 }
 
@@ -29,7 +29,7 @@ const dateOptions: { label: string; value: EventDateFilter; icon: keyof typeof I
 
 const sortOptions: { label: string; value: EventSortMode; icon: keyof typeof Ionicons.glyphMap }[] = [
   { label: "Date", value: "date", icon: "time-outline" },
-  { label: "Proche", value: "proximity", icon: "navigate-outline" },
+  { label: "Proximite", value: "proximity", icon: "navigate-outline" },
 ];
 
 export function FilterBar({
@@ -39,7 +39,6 @@ export function FilterBar({
   onDateFilterChange,
   onSelectedDateChange,
   onSortModeChange,
-  onProximityToggle,
   onReset,
 }: FilterBarProps) {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -51,66 +50,54 @@ export function FilterBar({
 
   return (
     <View className="gap-3">
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-row gap-2 pr-4">
-          {sortOptions.map((option) => (
-            <FilterChip
-              key={option.value}
-              icon={option.icon}
-              label={option.label}
-              isActive={filters.sortMode === option.value}
-              onPress={() => onSortModeChange(option.value)}
-            />
-          ))}
+      <ChipRow>
+        {sortOptions.map((option) => (
           <FilterChip
-            icon="locate-outline"
-            label={filters.proximityEnabled ? "Proche actif" : "Proche"}
-            isActive={filters.proximityEnabled}
-            onPress={() => onProximityToggle(!filters.proximityEnabled)}
+            key={option.value}
+            icon={option.icon}
+            label={option.label}
+            isActive={filters.sortMode === option.value}
+            onPress={() => onSortModeChange(option.value)}
           />
-          <FilterChip icon="refresh-outline" label="Reset" isActive={false} onPress={onReset} />
-        </View>
-      </ScrollView>
+        ))}
+        <FilterChip icon="refresh-outline" label="Reset" isActive={false} onPress={onReset} />
+      </ChipRow>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-row gap-2 pr-4">
-          {dateOptions.map((option) => (
-            <FilterChip
-              key={option.value}
-              icon={option.icon}
-              label={option.label}
-              isActive={!filters.selectedDate && filters.dateFilter === option.value}
-              onPress={() => onDateFilterChange(option.value)}
-            />
-          ))}
+      <ChipRow>
+        {dateOptions.map((option) => (
           <FilterChip
-            icon="calendar-outline"
-            label={selectedDateLabel}
-            isActive={Boolean(filters.selectedDate)}
-            onPress={() => setIsDatePickerVisible(true)}
+            key={option.value}
+            icon={option.icon}
+            label={option.label}
+            isActive={!filters.selectedDate && filters.dateFilter === option.value}
+            onPress={() => onDateFilterChange(option.value)}
           />
-        </View>
-      </ScrollView>
+        ))}
+        <FilterChip
+          icon="calendar-outline"
+          label={selectedDateLabel}
+          isActive={Boolean(filters.selectedDate)}
+          onPress={() => setIsDatePickerVisible(true)}
+        />
+      </ChipRow>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-row gap-2 pr-4">
+      <ChipRow>
+        <FilterChip
+          icon="grid-outline"
+          label="Toutes"
+          isActive={filters.category === "all"}
+          onPress={() => onCategoryChange("all")}
+        />
+        {categories.map((category) => (
           <FilterChip
-            icon="grid-outline"
-            label="Toutes"
-            isActive={filters.category === "all"}
-            onPress={() => onCategoryChange("all")}
+            key={category}
+            icon={getCategoryIcon(category)}
+            label={category}
+            isActive={filters.category === category}
+            onPress={() => onCategoryChange(category)}
           />
-          {categories.map((category) => (
-            <FilterChip
-              key={category}
-              icon={getCategoryIcon(category)}
-              label={category}
-              isActive={filters.category === category}
-              onPress={() => onCategoryChange(category)}
-            />
-          ))}
-        </View>
-      </ScrollView>
+        ))}
+      </ChipRow>
 
       <EventDatePickerModal
         visible={isDatePickerVisible}
@@ -120,6 +107,25 @@ export function FilterBar({
           onSelectedDateChange(toIsoDateString(dateValue));
           setIsDatePickerVisible(false);
         }}
+      />
+    </View>
+  );
+}
+
+function ChipRow({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+
+  return (
+    <View style={{ position: "relative" }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View className="flex-row gap-2 pr-4">{children}</View>
+      </ScrollView>
+      <LinearGradient
+        colors={["transparent", colors.background]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        pointerEvents="none"
+        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 28 }}
       />
     </View>
   );

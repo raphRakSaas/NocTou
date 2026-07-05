@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
 
@@ -35,9 +35,7 @@ export function HeaderActions({ trailingContent }: HeaderActionsProps) {
         style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
         onPress={() => router.push("/settings")}
       >
-        <Text className="text-sm font-bold" style={{ color: colors.text }}>
-          I
-        </Text>
+        <Ionicons name="settings-outline" size={18} color={colors.text} />
       </Pressable>
     </View>
   );
