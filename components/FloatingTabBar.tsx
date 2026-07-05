@@ -2,10 +2,13 @@ import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-t
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTheme } from "@/hooks/useTheme";
+
 const tabBarHorizontalInset = 40;
 
 export function FloatingTabBar(props: BottomTabBarProps) {
   const safeAreaInsets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   return (
     <View
@@ -18,7 +21,16 @@ export function FloatingTabBar(props: BottomTabBarProps) {
         },
       ]}
     >
-      <View style={styles.pill}>
+      <View
+        style={[
+          styles.pill,
+          {
+            backgroundColor: colors.tabBar.background,
+            borderColor: colors.tabBar.border,
+            shadowColor: colors.tabBar.shadow,
+          },
+        ]}
+      >
         <BottomTabBar {...props} />
       </View>
     </View>
@@ -33,12 +45,11 @@ const styles = StyleSheet.create({
   },
   pill: {
     borderRadius: 999,
-    backgroundColor: "#FFFFFF",
     overflow: "hidden",
-    shadowColor: "#0F172A",
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 10,
+    borderWidth: 1,
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 14,
   },
 });

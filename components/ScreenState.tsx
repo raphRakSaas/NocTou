@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
+import { useTheme } from "@/hooks/useTheme";
+
 interface ScreenStateProps {
   title: string;
   description: string;
@@ -15,11 +17,17 @@ export function ScreenState({
   isLoading = false,
   onActionPress,
 }: ScreenStateProps) {
+  const { colors } = useTheme();
+
   return (
     <View className="flex-1 items-center justify-center px-8 py-12">
-      {isLoading ? <ActivityIndicator size="small" color="#1D4ED8" /> : null}
-      <Text className="mt-4 text-center text-xl font-semibold text-slate-900">{title}</Text>
-      <Text className="mt-2 text-center text-sm leading-6 text-slate-600">{description}</Text>
+      {isLoading ? <ActivityIndicator size="small" color={colors.accentSoftText} /> : null}
+      <Text className="mt-4 text-center text-xl font-semibold" style={{ color: colors.text }}>
+        {title}
+      </Text>
+      <Text className="mt-2 text-center text-sm leading-6" style={{ color: colors.textMuted }}>
+        {description}
+      </Text>
       {actionLabel && onActionPress ? (
         <Pressable
           className="mt-6 rounded-full bg-blue-700 px-5 py-3"

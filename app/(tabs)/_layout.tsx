@@ -2,22 +2,32 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 import { FloatingTabBar } from "@/components/FloatingTabBar";
+import { HeaderActions } from "@/components/HeaderActions";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function TabsLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: colors.headerBackground,
+        },
+        headerTintColor: colors.text,
         headerTitleStyle: {
           fontWeight: "600",
+          color: colors.text,
         },
+        headerRight: () => <HeaderActions />,
         sceneStyle: {
-          backgroundColor: "#F8FAFC",
+          backgroundColor: colors.background,
         },
         tabBarShowLabel: true,
-        tabBarActiveTintColor: "#0F172A",
-        tabBarInactiveTintColor: "#64748B",
+        tabBarActiveTintColor: colors.tabBar.activeTint,
+        tabBarInactiveTintColor: colors.tabBar.inactiveTint,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: 64,
@@ -53,7 +63,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "home" : "home-outline"} size={18} color={color} />
           ),
-          tabBarActiveBackgroundColor: "#E2E8F0",
+          tabBarActiveBackgroundColor: colors.tabBar.activeHome,
         }}
       />
       <Tabs.Screen
@@ -67,7 +77,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "map" : "map-outline"} size={18} color={color} />
           ),
-          tabBarActiveBackgroundColor: "#DBEAFE",
+          tabBarActiveBackgroundColor: colors.tabBar.activeMap,
         }}
       />
       <Tabs.Screen
@@ -81,7 +91,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "heart" : "heart-outline"} size={18} color={color} />
           ),
-          tabBarActiveBackgroundColor: "#FCE7F3",
+          tabBarActiveBackgroundColor: colors.tabBar.activeFavorites,
         }}
       />
     </Tabs>

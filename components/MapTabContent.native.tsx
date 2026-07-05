@@ -13,10 +13,12 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
+import { HeaderActions } from "@/components/HeaderActions";
 import { Footer } from "@/components/Footer";
 import { MapEventSheet } from "@/components/MapEventSheet";
 import { ScreenState } from "@/components/ScreenState";
 import { useEvents } from "@/hooks/useEvents";
+import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { flattenEventPages, prioritizePhotoEvents } from "@/utils/events";
 
@@ -28,6 +30,7 @@ const toulouseRegion = {
 };
 
 export default function MapTabContent() {
+  const { colors } = useTheme();
   const eventsQuery = useEvents();
   const { width } = useWindowDimensions();
   const mapViewRef = useRef<MapView>(null);
@@ -84,7 +87,7 @@ export default function MapTabContent() {
 
   if (mapEvents.length === 0) {
     return (
-      <View className="flex-1 bg-slate-50">
+      <View className="flex-1" style={{ backgroundColor: colors.background }}>
         <ScreenState
           title="Aucun lieu exploitable"
           description="Aucun evenement avec coordonnees n'est disponible pour la carte."
@@ -97,10 +100,18 @@ export default function MapTabContent() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <Stack.Screen
         options={{
-          headerRight: () => <Text className="text-sm font-semibold text-slate-500">{mapEvents.length} lieux</Text>,
+          headerRight: () => (
+            <HeaderActions
+              trailingContent={
+                <Text className="text-sm font-semibold" style={{ color: colors.textMuted }}>
+                  {mapEvents.length} lieux
+                </Text>
+              }
+            />
+          ),
         }}
       />
 
@@ -150,11 +161,14 @@ export default function MapTabContent() {
       </MapView>
 
       <View className="pointer-events-none absolute inset-x-0 top-0 px-4 pt-4">
-        <View className="self-start rounded-full bg-white/92 px-4 py-2">
-          <Text className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+        <View
+          className="self-start rounded-full px-4 py-2"
+          style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+        >
+          <Text className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: colors.textMuted }}>
             Carte live
           </Text>
-          <Text className="mt-1 text-sm font-semibold text-slate-950">
+          <Text className="mt-1 text-sm font-semibold" style={{ color: colors.text }}>
             Touchez un marker pour afficher la sortie.
           </Text>
         </View>

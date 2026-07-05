@@ -1,4 +1,4 @@
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { useMemo } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 
@@ -12,6 +12,7 @@ import { ScreenState } from "@/components/ScreenState";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useEvents } from "@/hooks/useEvents";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useTheme } from "@/hooks/useTheme";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import {
   applyEventFilters,
@@ -24,6 +25,7 @@ import {
 } from "@/utils/events";
 
 export default function HomeScreen() {
+  const { colors } = useTheme();
   const eventsQuery = useEvents();
   const { filters, resetFilters, setCategory, setDateFilter, setProximityEnabled, setSortMode } =
     useEventFilters();
@@ -63,17 +65,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
-      <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Pressable onPress={() => router.push("/legal")}>
-              <Text className="text-sm font-semibold text-slate-700">Source</Text>
-            </Pressable>
-          ),
-        }}
-      />
-
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <FlatList
         data={filteredEvents}
         keyExtractor={(eventItem) => eventItem.id}
@@ -123,9 +115,14 @@ export default function HomeScreen() {
             ) : null}
 
             {userLocation.isLoading ? (
-              <View className="flex-row items-center gap-3 rounded-2xl bg-blue-50 px-4 py-3">
-                <ActivityIndicator size="small" color="#1D4ED8" />
-                <Text className="text-sm text-blue-800">Recherche de votre position...</Text>
+              <View
+                className="flex-row items-center gap-3 rounded-2xl px-4 py-3"
+                style={{ backgroundColor: colors.accentSoft }}
+              >
+                <ActivityIndicator size="small" color={colors.accentSoftText} />
+                <Text className="text-sm" style={{ color: colors.accentSoftText }}>
+                  Recherche de votre position...
+                </Text>
               </View>
             ) : null}
 
@@ -133,14 +130,16 @@ export default function HomeScreen() {
               <View className="gap-3">
                 <View className="flex-row items-end justify-between px-1">
                   <View>
-                    <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
                       Ce week-end
                     </Text>
-                    <Text className="mt-1 text-xl font-semibold text-slate-950">
+                    <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
                       Les sorties qui arrivent
                     </Text>
                   </View>
-                  <Text className="text-sm font-medium text-slate-500">Scroll horizontal</Text>
+                  <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
+                    Scroll horizontal
+                  </Text>
                 </View>
 
                 <FlatList
@@ -162,12 +161,16 @@ export default function HomeScreen() {
               <View key={shelf.title} className="gap-3">
                 <View className="flex-row items-end justify-between px-1">
                   <View>
-                    <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
                       Categorie
                     </Text>
-                    <Text className="mt-1 text-xl font-semibold text-slate-950">{shelf.title}</Text>
+                    <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
+                      {shelf.title}
+                    </Text>
                   </View>
-                  <Text className="text-sm font-medium text-slate-500">{shelf.items.length} sorties</Text>
+                  <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
+                    {shelf.items.length} sorties
+                  </Text>
                 </View>
 
                 <FlatList
@@ -187,12 +190,16 @@ export default function HomeScreen() {
 
             <View className="flex-row items-end justify-between px-1">
               <View>
-                <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
                   Explorer
                 </Text>
-                <Text className="mt-1 text-xl font-semibold text-slate-950">Toutes les sorties</Text>
+                <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
+                  Toutes les sorties
+                </Text>
               </View>
-              <Text className="text-sm font-medium text-slate-500">1 evenement par ligne</Text>
+              <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
+                1 evenement par ligne
+              </Text>
             </View>
           </View>
         }
@@ -208,14 +215,17 @@ export default function HomeScreen() {
           <View className="pt-2">
             {eventsQuery.hasNextPage ? (
               <Pressable
-                className="mb-4 items-center rounded-full bg-slate-900 px-5 py-4"
+                className="mb-4 items-center rounded-full px-5 py-4"
+                style={{ backgroundColor: colors.primaryButton }}
                 disabled={eventsQuery.isFetchingNextPage}
                 onPress={() => void eventsQuery.fetchNextPage()}
               >
                 {eventsQuery.isFetchingNextPage ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color={colors.primaryButtonText} />
                 ) : (
-                  <Text className="font-semibold text-white">Charger plus de sorties</Text>
+                  <Text className="font-semibold" style={{ color: colors.primaryButtonText }}>
+                    Charger plus de sorties
+                  </Text>
                 )}
               </Pressable>
             ) : null}

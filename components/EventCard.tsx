@@ -1,6 +1,7 @@
 import { Image, Pressable, Text, View } from "react-native";
 
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatDistance } from "@/utils/events";
 
@@ -19,11 +20,15 @@ export function EventCard({
   onPress,
   onToggleFavorite,
 }: EventCardProps) {
+  const { colors } = useTheme();
   const cardImageUrl =
     eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
 
   return (
-    <View className="mb-4 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <View
+      className="mb-4 overflow-hidden rounded-3xl border"
+      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+    >
       <Pressable onPress={onPress}>
         <View>
           <Image
@@ -41,15 +46,21 @@ export function EventCard({
           </View>
         </View>
         <View className="px-5 py-4">
-          <Text className="text-sm font-medium text-slate-900">{eventItem.venueName}</Text>
-          <Text className="mt-1 text-sm leading-5 text-slate-600">{eventItem.summary}</Text>
+          <Text className="text-sm font-medium" style={{ color: colors.text }}>
+            {eventItem.venueName}
+          </Text>
+          <Text className="mt-1 text-sm leading-5" style={{ color: colors.textMuted }}>
+            {eventItem.summary}
+          </Text>
           <View className="mt-4 flex-row flex-wrap items-center gap-2">
-            <View className="rounded-full bg-slate-100 px-3 py-1">
-              <Text className="text-xs font-medium text-slate-700">{eventItem.price}</Text>
+            <View className="rounded-full px-3 py-1" style={{ backgroundColor: colors.surfaceMuted }}>
+              <Text className="text-xs font-medium" style={{ color: colors.text }}>
+                {eventItem.price}
+              </Text>
             </View>
             {formatDistance(distanceInKilometers) ? (
-              <View className="rounded-full bg-blue-50 px-3 py-1">
-                <Text className="text-xs font-medium text-blue-700">
+              <View className="rounded-full px-3 py-1" style={{ backgroundColor: colors.accentSoft }}>
+                <Text className="text-xs font-medium" style={{ color: colors.accentSoftText }}>
                   {formatDistance(distanceInKilometers)}
                 </Text>
               </View>
@@ -57,10 +68,30 @@ export function EventCard({
           </View>
         </View>
       </Pressable>
-      <View className="flex-row items-center justify-between border-t border-slate-100 px-5 py-4">
-        <Text className="text-sm font-medium text-slate-500">{eventItem.city}</Text>
-        <Pressable className="rounded-full bg-slate-900 px-4 py-2" onPress={onToggleFavorite}>
-          <Text className="text-sm font-semibold text-white">
+      <View
+        className="flex-row items-center justify-between px-5 py-4"
+        style={{ borderTopColor: colors.divider, borderTopWidth: 1 }}
+      >
+        <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
+          {eventItem.city}
+        </Text>
+        <Pressable
+          className="rounded-full px-4 py-2"
+          style={{
+            backgroundColor: isFavorite
+              ? colors.favoriteButton.activeBackground
+              : colors.favoriteButton.inactiveBackground,
+          }}
+          onPress={onToggleFavorite}
+        >
+          <Text
+            className="text-sm font-semibold"
+            style={{
+              color: isFavorite
+                ? colors.favoriteButton.activeText
+                : colors.favoriteButton.inactiveText,
+            }}
+          >
             {isFavorite ? "Retirer" : "Favori"}
           </Text>
         </Pressable>
