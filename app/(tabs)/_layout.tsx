@@ -26,28 +26,17 @@ export default function TabsLayout() {
         sceneStyle: {
           backgroundColor: colors.background,
         },
-        tabBarShowLabel: true,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: colors.tabBar.activeTint,
         tabBarInactiveTintColor: colors.tabBar.inactiveTint,
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginTop: 2,
-        },
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 76,
-          paddingTop: 6,
-          paddingBottom: 6,
-          paddingHorizontal: 8,
+          position: "absolute",
+          height: 0,
           borderTopWidth: 0,
           backgroundColor: "transparent",
           elevation: 0,
           shadowOpacity: 0,
-        },
-        tabBarItemStyle: {
-          borderRadius: 999,
-          overflow: "hidden",
         },
       }}
     >
