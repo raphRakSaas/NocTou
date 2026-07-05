@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 
 import { EventDatePickerModal } from "@/components/EventDatePickerModal";
+import { FilterOptionsSheet } from "@/components/FilterOptionsSheet";
 import { GlassSurface } from "@/components/GlassSurface";
 import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
@@ -20,17 +20,53 @@ interface FilterBarProps {
   onReset: () => void;
 }
 
+type FilterPanel = "date" | "category" | "sort" | null;
+
 const dateOptions: { label: string; value: EventDateFilter; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { label: "Toutes", value: "all", icon: "apps-outline" },
+  { label: "Toutes les dates", value: "all", icon: "apps-outline" },
   { label: "Aujourd'hui", value: "today", icon: "today-outline" },
-  { label: "7 jours", value: "week", icon: "calendar-outline" },
-  { label: "30 jours", value: "month", icon: "calendar-number-outline" },
+  { label: "7 prochains jours", value: "week", icon: "calendar-outline" },
+  { label: "30 prochains jours", value: "month", icon: "calendar-number-outline" },
 ];
 
 const sortOptions: { label: string; value: EventSortMode; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { label: "Date", value: "date", icon: "time-outline" },
-  { label: "Proximite", value: "proximity", icon: "navigate-outline" },
+  { label: "Par date", value: "date", icon: "time-outline" },
+  { label: "Par proximite", value: "proximity", icon: "navigate-outline" },
 ];
+
+function getDateFilterLabel(filters: EventFilters): string {
+  if (filters.selectedDate) {
+    return formatIsoDateLabel(filters.selectedDate);
+  }
+
+  switch (filters.dateFilter) {
+    case "today":
+      return "Aujourd'hui";
+    case "week":
+      return "7 jours";
+    case "month":
+      return "30 jours";
+    default:
+      return "Date";
+  }
+}
+
+function getCategoryLabel(category: string): string {
+  return category === "all" ? "Categorie" : category;
+}
+
+function getSortLabel(sortMode: EventSortMode): string {
+  return sortMode === "proximity" ? "Proche" : "Tri";
+}
+
+function hasActiveFilters(filters: EventFilters): boolean {
+  return (
+    filters.category !== "all" ||
+    filters.dateFilter !== "all" ||
+    filters.selectedDate !== null ||
+    filters.sortMode === "proximity"
+  );
+}
 
 export function FilterBar({
   categories,
@@ -41,63 +77,96 @@ export function FilterBar({
   onSortModeChange,
   onReset,
 }: FilterBarProps) {
+  const { colors } = useTheme();
+  const [activePanel, setActivePanel] = useState<FilterPanel>(null);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+
   const pickerDate = useMemo(
     () => (filters.selectedDate ? parseEventDate(filters.selectedDate) : new Date()),
     [filters.selectedDate],
   );
-  const selectedDateLabel = filters.selectedDate ? formatIsoDateLabel(filters.selectedDate) : "Choisir";
+
+  const categoryOptions = useMemo(
+    () => [
+      { label: "Toutes les categories", value: "all", icon: "grid-outline" as const },
+      ...categories.map((category) => ({
+        label: category,
+        value: category,
+        icon: getCategoryIcon(category),
+      })),
+    ],
+    [categories],
+  );
+
+  const dateSheetValue = filters.selectedDate ? "custom" : filters.dateFilter;
+  const isDateActive = filters.dateFilter !== "all" || filters.selectedDate !== null;
+  const isCategoryActive = filters.category !== "all";
+  const isSortActive = filters.sortMode === "proximity";
 
   return (
-    <View className="gap-3">
-      <ChipRow>
-        {sortOptions.map((option) => (
-          <FilterChip
-            key={option.value}
-            icon={option.icon}
-            label={option.label}
-            isActive={filters.sortMode === option.value}
-            onPress={() => onSortModeChange(option.value)}
-          />
-        ))}
-        <FilterChip icon="refresh-outline" label="Reset" isActive={false} onPress={onReset} />
-      </ChipRow>
-
-      <ChipRow>
-        {dateOptions.map((option) => (
-          <FilterChip
-            key={option.value}
-            icon={option.icon}
-            label={option.label}
-            isActive={!filters.selectedDate && filters.dateFilter === option.value}
-            onPress={() => onDateFilterChange(option.value)}
-          />
-        ))}
-        <FilterChip
+    <View className="gap-2">
+      <View className="flex-row gap-2">
+        <FilterTriggerButton
           icon="calendar-outline"
-          label={selectedDateLabel}
-          isActive={Boolean(filters.selectedDate)}
-          onPress={() => setIsDatePickerVisible(true)}
+          label={getDateFilterLabel(filters)}
+          isActive={isDateActive}
+          onPress={() => setActivePanel("date")}
         />
-      </ChipRow>
+        <FilterTriggerButton
+          icon={filters.category === "all" ? "grid-outline" : getCategoryIcon(filters.category)}
+          label={getCategoryLabel(filters.category)}
+          isActive={isCategoryActive}
+          onPress={() => setActivePanel("category")}
+        />
+        <FilterTriggerButton
+          icon={filters.sortMode === "proximity" ? "navigate-outline" : "time-outline"}
+          label={getSortLabel(filters.sortMode)}
+          isActive={isSortActive}
+          onPress={() => setActivePanel("sort")}
+        />
+      </View>
 
-      <ChipRow>
-        <FilterChip
-          icon="grid-outline"
-          label="Toutes"
-          isActive={filters.category === "all"}
-          onPress={() => onCategoryChange("all")}
-        />
-        {categories.map((category) => (
-          <FilterChip
-            key={category}
-            icon={getCategoryIcon(category)}
-            label={category}
-            isActive={filters.category === category}
-            onPress={() => onCategoryChange(category)}
-          />
-        ))}
-      </ChipRow>
+      {hasActiveFilters(filters) ? (
+        <Pressable className="self-start flex-row items-center gap-1.5 px-1 py-1" onPress={onReset}>
+          <Ionicons name="refresh-outline" size={14} color={colors.accent} />
+          <Text className="text-sm font-medium" style={{ color: colors.accentSoftText }}>
+            Reinitialiser les filtres
+          </Text>
+        </Pressable>
+      ) : null}
+
+      <FilterOptionsSheet
+        visible={activePanel === "date"}
+        title="Quand ?"
+        options={dateOptions}
+        selectedValue={dateSheetValue === "custom" ? ("none" as EventDateFilter) : dateSheetValue}
+        onSelect={onDateFilterChange}
+        onClose={() => setActivePanel(null)}
+        footerAction={{
+          label: filters.selectedDate ? formatIsoDateLabel(filters.selectedDate) : "Choisir une date",
+          icon: "calendar-outline",
+          isSelected: Boolean(filters.selectedDate),
+          onPress: () => setIsDatePickerVisible(true),
+        }}
+      />
+
+      <FilterOptionsSheet
+        visible={activePanel === "category"}
+        title="Quoi ?"
+        options={categoryOptions}
+        selectedValue={filters.category}
+        onSelect={onCategoryChange}
+        onClose={() => setActivePanel(null)}
+      />
+
+      <FilterOptionsSheet
+        visible={activePanel === "sort"}
+        title="Trier par"
+        options={sortOptions}
+        selectedValue={filters.sortMode}
+        onSelect={onSortModeChange}
+        onClose={() => setActivePanel(null)}
+      />
 
       <EventDatePickerModal
         visible={isDatePickerVisible}
@@ -112,52 +181,42 @@ export function FilterBar({
   );
 }
 
-function ChipRow({ children }: { children: ReactNode }) {
-  const { colors } = useTheme();
-
-  return (
-    <View style={{ position: "relative" }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-row gap-2 pr-4">{children}</View>
-      </ScrollView>
-      <LinearGradient
-        colors={["transparent", colors.background]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        pointerEvents="none"
-        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 28 }}
-      />
-    </View>
-  );
-}
-
-interface FilterChipProps {
-  label: string;
+interface FilterTriggerButtonProps {
   icon: keyof typeof Ionicons.glyphMap;
+  label: string;
   isActive: boolean;
   onPress: () => void;
 }
 
-function FilterChip({ label, icon, isActive, onPress }: FilterChipProps) {
+function FilterTriggerButton({ icon, label, isActive, onPress }: FilterTriggerButtonProps) {
   const { colors } = useTheme();
 
   return (
-    <Pressable onPress={onPress}>
-      <GlassSurface borderRadius={999}>
+    <Pressable className="flex-1" onPress={onPress}>
+      <GlassSurface borderRadius={20}>
         <View
-          className="flex-row items-center gap-2 px-4 py-2.5"
+          className="flex-row items-center justify-center gap-1.5 px-3 py-3"
           style={{
             backgroundColor: isActive ? colors.chip.activeBackground : "transparent",
           }}
         >
-          <Ionicons name={icon} size={14} color={isActive ? colors.chip.activeText : colors.textMuted} />
+          <Ionicons
+            name={icon}
+            size={15}
+            color={isActive ? colors.chip.activeText : colors.textMuted}
+          />
           <Text
-            className="text-sm font-medium"
+            className="flex-1 text-sm font-semibold"
             style={{ color: isActive ? colors.chip.activeText : colors.text }}
             numberOfLines={1}
           >
             {label}
           </Text>
+          <Ionicons
+            name="chevron-down"
+            size={14}
+            color={isActive ? colors.chip.activeText : colors.textMuted}
+          />
         </View>
       </GlassSurface>
     </Pressable>
