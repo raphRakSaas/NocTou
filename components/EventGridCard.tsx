@@ -3,7 +3,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
-import { formatDistance } from "@/utils/events";
+import { formatDistance, formatEventPreviewDate } from "@/utils/events";
 
 interface EventGridCardProps {
   eventItem: EventItem;
@@ -23,6 +23,8 @@ export function EventGridCard({
   const { colors } = useTheme();
   const cardImageUrl =
     eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
+
+  const previewDate = formatEventPreviewDate(eventItem);
 
   return (
     <View
@@ -46,7 +48,8 @@ export function EventGridCard({
               {eventItem.title}
             </Text>
             <Text className="mt-2 text-sm" style={{ color: colors.textMuted }} numberOfLines={1}>
-              {eventItem.displayDate}
+              {previewDate.label}
+              {previewDate.hasMoreDates ? " · + dates" : ""}
             </Text>
             <Text className="mt-1 text-sm" style={{ color: colors.textMuted }} numberOfLines={1}>
               {eventItem.venueName}

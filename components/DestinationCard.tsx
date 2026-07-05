@@ -6,7 +6,7 @@ import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
-import { formatDistance } from "@/utils/events";
+import { formatDistance, formatEventPreviewDate } from "@/utils/events";
 
 interface DestinationCardProps {
   eventItem: EventItem;
@@ -30,6 +30,7 @@ export function DestinationCard({
     eventItem.imageUrl ?? eventItem.imagePreviewUrl ?? getCategoryFallbackImageUrl(eventItem.category);
   const cardWidth = variant === "portrait" ? 210 : undefined;
   const cardHeight = variant === "portrait" ? 300 : 280;
+  const previewDate = formatEventPreviewDate(eventItem);
 
   return (
     <Pressable
@@ -75,7 +76,10 @@ export function DestinationCard({
         </Text>
 
         <View className="mt-3 flex-row flex-wrap gap-2">
-          <MetadataChip icon="calendar-outline" label={eventItem.displayDate} />
+          <MetadataChip icon="calendar-outline" label={previewDate.label} />
+          {previewDate.hasMoreDates ? (
+            <MetadataChip icon="time-outline" label="+ dates" />
+          ) : null}
           {formatDistance(distanceInKilometers) ? (
             <MetadataChip icon="navigate-outline" label={formatDistance(distanceInKilometers) as string} />
           ) : (

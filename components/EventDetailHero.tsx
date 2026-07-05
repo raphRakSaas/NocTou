@@ -66,7 +66,7 @@ export function EventDetailHero({
               </View>
 
               <View className="mt-4 flex-row flex-wrap gap-2">
-                <InfoChip colors={colors} icon="calendar-outline" label={formatLongDate(eventItem.startDate)} />
+                <InfoChip colors={colors} icon="calendar-outline" label={eventItem.displayDate || formatLongDate(eventItem.startDate)} />
                 <InfoChip colors={colors} icon="cash-outline" label={eventItem.price} />
                 <InfoChip colors={colors} icon="location-outline" label={eventItem.city} />
               </View>

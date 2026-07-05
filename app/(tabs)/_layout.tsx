@@ -66,7 +66,7 @@ export default function TabsLayout() {
         name="map"
         options={{
           title: "Carte",
-          headerTitle: "Carte des sorties",
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "map" : "map-outline"} size={20} color={color} />
           ),

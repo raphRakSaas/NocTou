@@ -100,6 +100,81 @@ export function formatLongDate(dateValue: string): string {
   }).format(parseEventDate(dateValue));
 }
 
+export interface EventPreviewDate {
+  label: string;
+  hasMoreDates: boolean;
+}
+
+export function formatEventPreviewDate(eventItem: EventItem): EventPreviewDate {
+  const todayAtMidnight = startOfToday();
+  const candidateDates = collectEventDates(eventItem).sort(
+    (leftDate, rightDate) => leftDate.getTime() - rightDate.getTime(),
+  );
+  const upcomingDates = candidateDates.filter((dateValue) => dateValue >= todayAtMidnight);
+  const referenceDates = upcomingDates.length > 0 ? upcomingDates : candidateDates;
+  const nextDate = referenceDates[0];
+
+  if (!nextDate) {
+    return { label: "Date a confirmer", hasMoreDates: false };
+  }
+
+  const hasMoreDates =
+    referenceDates.length > 1 ||
+    candidateDates.length > 1 ||
+    Boolean(eventItem.endDate && eventItem.endDate !== eventItem.startDate);
+
+  let label = formatShortFrenchDate(nextDate);
+
+  if (upcomingDates.length === 0 && candidateDates.length > 0) {
+    label = `Termine · ${label}`;
+  } else if (hasMoreDates) {
+    label = `Prochaine · ${label}`;
+  }
+
+  return { label, hasMoreDates };
+}
+
+function collectEventDates(eventItem: EventItem): Date[] {
+  const uniqueDateTimestamps = new Set<number>();
+
+  const registerDate = (dateValue: Date) => {
+    if (Number.isNaN(dateValue.getTime())) {
+      return;
+    }
+
+    uniqueDateTimestamps.add(startOfDay(dateValue).getTime());
+  };
+
+  registerDate(parseEventDate(eventItem.startDate));
+
+  if (eventItem.endDate) {
+    registerDate(parseEventDate(eventItem.endDate));
+  }
+
+  for (const match of eventItem.displayDate.matchAll(/(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})/g)) {
+    registerDate(new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1])));
+  }
+
+  return [...uniqueDateTimestamps].map((timestamp) => new Date(timestamp));
+}
+
+function startOfToday(): Date {
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+}
+
+function startOfDay(dateValue: Date): Date {
+  return new Date(dateValue.getFullYear(), dateValue.getMonth(), dateValue.getDate());
+}
+
+function formatShortFrenchDate(dateValue: Date): string {
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(dateValue);
+}
+
 export function formatDistance(distanceInKilometers: number | null): string | null {
   if (distanceInKilometers == null) {
     return null;

@@ -5,6 +5,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 
 const tabBarHorizontalInset = 28;
+export const floatingTabBarHeight = 76;
+const floatingTabBarBottomOffset = 4;
+
+export function getFloatingTabBarClearance(safeAreaBottom: number, extraSpacing = 16): number {
+  return floatingTabBarHeight + Math.max(safeAreaBottom, 12) + floatingTabBarBottomOffset + extraSpacing;
+}
 
 export function FloatingTabBar(props: BottomTabBarProps) {
   const safeAreaInsets = useSafeAreaInsets();
