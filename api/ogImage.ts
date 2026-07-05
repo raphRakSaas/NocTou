@@ -69,7 +69,7 @@ async function fetchOpenGraphImage(pageUrl: string): Promise<string | null> {
       signal: abortController.signal,
       headers: {
         Accept: "text/html",
-        "User-Agent": "Mozilla/5.0 (compatible; NocTouBot/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; SortiRoseBot/1.0)",
       },
     });
 

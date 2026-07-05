@@ -32,7 +32,7 @@ export default function SettingsScreen() {
           Parametres
         </Text>
         <Text className="mt-2 text-center text-sm leading-6" style={{ color: colors.textMuted }}>
-          Personnalisez NocTou, consultez les sources et les informations legales.
+          Personnalisez SortiRose, consultez les sources et les informations legales.
         </Text>
       </View>
 
@@ -74,7 +74,7 @@ export default function SettingsScreen() {
         />
         <SettingsLink
           colors={colors}
-          description="Conditions generales d utilisation de NocTou."
+          description="Conditions generales d utilisation de SortiRose."
           icon="shield-checkmark-outline"
           label="CGU"
           onPress={() => router.push("/terms")}
@@ -90,7 +90,7 @@ export default function SettingsScreen() {
 
       <View className="mt-2 px-2">
         <Text className="text-center text-xs" style={{ color: colors.textMuted }}>
-          NocTou v1.0.0 · {isDark ? "Theme sombre" : "Theme clair"}
+          SortiRose v1.0.0 · {isDark ? "Theme sombre" : "Theme clair"}
         </Text>
       </View>
     </ScrollView>

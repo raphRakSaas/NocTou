@@ -18,7 +18,7 @@ export default function TermsScreen() {
           Conditions generales d utilisation
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          NocTou est une application de consultation d evenements culturels a Toulouse, developpee
+          SortiRose est une application de consultation d evenements culturels a Toulouse, developpee
           et editee a titre personnel par un developpeur independant. En utilisant l application,
           vous acceptez les presentes conditions generales d utilisation (CGU).
         </Text>
@@ -26,7 +26,7 @@ export default function TermsScreen() {
         <LegalBlock
           colors={colors}
           title="Objet"
-          description="NocTou centralise des informations publiques sur les sorties culturelles a Toulouse. L application ne garantit pas l exhaustivite, l exactitude ni la disponibilite permanente des evenements affiches, ces donnees provenant de sources tierces."
+          description="SortiRose centralise des informations publiques sur les sorties culturelles a Toulouse. L application ne garantit pas l exhaustivite, l exactitude ni la disponibilite permanente des evenements affiches, ces donnees provenant de sources tierces."
         />
         <LegalBlock
           colors={colors}
@@ -36,7 +36,7 @@ export default function TermsScreen() {
         <LegalBlock
           colors={colors}
           title="Reservations"
-          description="Les reservations et achats de billets se font exclusivement sur les sites tiers indiques dans chaque fiche evenement, lorsque cette information est disponible. NocTou n intervient pas dans ces transactions et n est pas responsable des conditions de vente, des paiements ou de la relation contractuelle entre l utilisateur et l organisateur ou la billetterie."
+          description="Les reservations et achats de billets se font exclusivement sur les sites tiers indiques dans chaque fiche evenement, lorsque cette information est disponible. SortiRose n intervient pas dans ces transactions et n est pas responsable des conditions de vente, des paiements ou de la relation contractuelle entre l utilisateur et l organisateur ou la billetterie."
         />
         <LegalBlock
           colors={colors}

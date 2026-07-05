@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "NocTou",
+    "name": "SortiRose",
     "slug": "NocTou",
     "owner": "raphaelrak",
-    "scheme": "noctou",
+    "scheme": "sortirose",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,12 +13,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.plum.noctou"
+      "bundleIdentifier": "com.plum.sortirose"
     },
     "android": {
-      "package": "com.plum.noctou",
+      "package": "com.plum.sortirose",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F7F3F0",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -40,7 +40,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "NocTou utilise votre position pour trier les sorties proches de vous."
+          "locationWhenInUsePermission": "SortiRose utilise votre position pour trier les sorties proches de vous."
         }
       ]
     ],

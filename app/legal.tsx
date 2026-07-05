@@ -23,7 +23,7 @@ export default function LegalScreen() {
           Mentions legales
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          NocTou est un projet personnel, developpe et publie a titre non professionnel par un
+          SortiRose est un projet personnel, developpe et publie a titre non professionnel par un
           developpeur independant. Conformement a l article 6-III de la loi n. 2004-575 du 21 juin
           2004 pour la confiance dans l economie numerique (LCEN), les editeurs non professionnels
           peuvent ne pas rendre publiques certaines informations d identification, des lors que
@@ -39,17 +39,17 @@ export default function LegalScreen() {
           <LegalBlock
             colors={colors}
             title="Hebergement"
-            description="NocTou est distribuee via l'App Store (Apple Inc.) et le Google Play Store (Google Ireland Limited). L'application ne dispose pas de serveur propre : elle interroge directement, depuis l'appareil de l'utilisateur, les API publiques listees ci-dessous."
+            description="SortiRose est distribuee via l'App Store (Apple Inc.) et le Google Play Store (Google Ireland Limited). L'application ne dispose pas de serveur propre : elle interroge directement, depuis l'appareil de l'utilisateur, les API publiques listees ci-dessous."
           />
           <LegalBlock
             colors={colors}
             title="Propriete intellectuelle"
-            description="La structure, le design, les textes et le code de l'application NocTou sont la propriete de l'editeur, sauf mention contraire. Les donnees d'evenements affichees restent la propriete de leurs producteurs respectifs (Toulouse Metropole, lieux culturels, organisateurs)."
+            description="La structure, le design, les textes et le code de l'application SortiRose sont la propriete de l'editeur, sauf mention contraire. Les donnees d'evenements affichees restent la propriete de leurs producteurs respectifs (Toulouse Metropole, lieux culturels, organisateurs)."
           />
           <LegalBlock
             colors={colors}
             title="Source des donnees"
-            description="Agenda des manifestations culturelles - So Toulouse, publie en Open Data par Toulouse Metropole sous Licence Ouverte / Open Licence version 2.0 (Etalab). Cette licence autorise la reutilisation gratuite des donnees, sous reserve de mentionner leur source et leur date de derniere mise a jour, ce que fait NocTou sur chaque ecran listant des sorties."
+            description="Agenda des manifestations culturelles - So Toulouse, publie en Open Data par Toulouse Metropole sous Licence Ouverte / Open Licence version 2.0 (Etalab). Cette licence autorise la reutilisation gratuite des donnees, sous reserve de mentionner leur source et leur date de derniere mise a jour, ce que fait SortiRose sur chaque ecran listant des sorties."
           />
           <LegalBlock
             colors={colors}
@@ -64,7 +64,7 @@ export default function LegalScreen() {
           <LegalBlock
             colors={colors}
             title="Reservation"
-            description="Les liens de reservation renvoient vers des sites tiers independants de NocTou. L'editeur n'est pas partie aux transactions qui y sont effectuees et decline toute responsabilite quant a leur execution."
+            description="Les liens de reservation renvoient vers des sites tiers independants de SortiRose. L'editeur n'est pas partie aux transactions qui y sont effectuees et decline toute responsabilite quant a leur execution."
           />
         </View>
 

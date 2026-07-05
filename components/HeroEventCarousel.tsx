@@ -57,7 +57,7 @@ export function HeroEventCarousel({
   if (heroSlides.length === 0) {
     return (
       <View className="rounded-[32px] bg-slate-950 px-5 pb-5 pt-6">
-        <Text className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">NocTou</Text>
+        <Text className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">SortiRose</Text>
         <Text className="mt-3 text-[32px] font-semibold leading-9 text-white">
           Les sorties qui donnent envie de sortir ce soir.
         </Text>

@@ -20,14 +20,14 @@ export default function PrivacyScreen() {
           Politique de confidentialite
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          NocTou est concue pour limiter au maximum la collecte de donnees personnelles. Aucun
+          SortiRose est concue pour limiter au maximum la collecte de donnees personnelles. Aucun
           compte n est requis pour utiliser l application.
         </Text>
 
         <LegalBlock
           colors={colors}
           title="Responsable du traitement"
-          description="Raphael, developpeur independant, editeur de NocTou a titre personnel et non professionnel. Contact : raphael.rakotonaivo.saas@gmail.com."
+          description="Raphael, developpeur independant, editeur de SortiRose a titre personnel et non professionnel. Contact : raphael.rakotonaivo.saas@gmail.com."
         />
         <LegalBlock
           colors={colors}

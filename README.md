@@ -1,4 +1,4 @@
-# NocTou
+# SortiRose
 
 Application mobile Expo pour centraliser l'agenda culturel et evenementiel de Toulouse.
 
@@ -129,6 +129,6 @@ npm exec --yes eas-cli -- build --platform android --profile preview
 
 ## Source des donnees
 
-NocTou utilise l'Open Data de Toulouse Metropole :
+SortiRose utilise l'Open Data de Toulouse Metropole :
 
 [Agenda des manifestations culturelles - So Toulouse](https://data.toulouse-metropole.fr/explore/dataset/agenda-des-manifestations-culturelles-so-toulouse/)
