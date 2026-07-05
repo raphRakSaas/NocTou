@@ -1,16 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
-import { getCategoryIcon } from "@/constants/categoryIcons";
+import { EventDatePickerModal } from "@/components/EventDatePickerModal";
 import { GlassSurface } from "@/components/GlassSurface";
+import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventDateFilter, EventFilters, EventSortMode } from "@/types/event";
+import { formatIsoDateLabel, parseEventDate, toIsoDateString } from "@/utils/events";
 
 interface FilterBarProps {
   categories: string[];
   filters: EventFilters;
   onCategoryChange: (category: string) => void;
   onDateFilterChange: (dateFilter: EventDateFilter) => void;
+  onSelectedDateChange: (selectedDate: string | null) => void;
   onSortModeChange: (sortMode: EventSortMode) => void;
   onProximityToggle: (isEnabled: boolean) => void;
   onReset: () => void;
@@ -33,10 +37,18 @@ export function FilterBar({
   filters,
   onCategoryChange,
   onDateFilterChange,
+  onSelectedDateChange,
   onSortModeChange,
   onProximityToggle,
   onReset,
 }: FilterBarProps) {
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const pickerDate = useMemo(
+    () => (filters.selectedDate ? parseEventDate(filters.selectedDate) : new Date()),
+    [filters.selectedDate],
+  );
+  const selectedDateLabel = filters.selectedDate ? formatIsoDateLabel(filters.selectedDate) : "Choisir";
+
   return (
     <View className="gap-3">
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -50,15 +62,6 @@ export function FilterBar({
               onPress={() => onSortModeChange(option.value)}
             />
           ))}
-          {dateOptions.map((option) => (
-            <FilterChip
-              key={option.value}
-              icon={option.icon}
-              label={option.label}
-              isActive={filters.dateFilter === option.value}
-              onPress={() => onDateFilterChange(option.value)}
-            />
-          ))}
           <FilterChip
             icon="locate-outline"
             label={filters.proximityEnabled ? "Proche actif" : "Proche"}
@@ -66,6 +69,26 @@ export function FilterBar({
             onPress={() => onProximityToggle(!filters.proximityEnabled)}
           />
           <FilterChip icon="refresh-outline" label="Reset" isActive={false} onPress={onReset} />
+        </View>
+      </ScrollView>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View className="flex-row gap-2 pr-4">
+          {dateOptions.map((option) => (
+            <FilterChip
+              key={option.value}
+              icon={option.icon}
+              label={option.label}
+              isActive={!filters.selectedDate && filters.dateFilter === option.value}
+              onPress={() => onDateFilterChange(option.value)}
+            />
+          ))}
+          <FilterChip
+            icon="calendar-outline"
+            label={selectedDateLabel}
+            isActive={Boolean(filters.selectedDate)}
+            onPress={() => setIsDatePickerVisible(true)}
+          />
         </View>
       </ScrollView>
 
@@ -88,6 +111,16 @@ export function FilterBar({
           ))}
         </View>
       </ScrollView>
+
+      <EventDatePickerModal
+        visible={isDatePickerVisible}
+        selectedDate={pickerDate}
+        onCancel={() => setIsDatePickerVisible(false)}
+        onConfirm={(dateValue) => {
+          onSelectedDateChange(toIsoDateString(dateValue));
+          setIsDatePickerVisible(false);
+        }}
+      />
     </View>
   );
 }
@@ -115,6 +148,7 @@ function FilterChip({ label, icon, isActive, onPress }: FilterChipProps) {
           <Text
             className="text-sm font-medium"
             style={{ color: isActive ? colors.chip.activeText : colors.text }}
+            numberOfLines={1}
           >
             {label}
           </Text>

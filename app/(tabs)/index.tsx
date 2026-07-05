@@ -58,7 +58,7 @@ export default function HomeScreen() {
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const eventsQuery = useEvents();
-  const { filters, resetFilters, setCategory, setDateFilter, setProximityEnabled, setSortMode } =
+  const { filters, resetFilters, setCategory, setDateFilter, setProximityEnabled, setSelectedDate, setSortMode } =
     useEventFilters();
   const { isFavorite, isReady, toggleFavorite } = useFavorites();
   const userLocation = useUserLocation(filters.proximityEnabled);
@@ -137,6 +137,7 @@ export default function HomeScreen() {
               filters={filters}
               onCategoryChange={setCategory}
               onDateFilterChange={setDateFilter}
+              onSelectedDateChange={setSelectedDate}
               onSortModeChange={setSortMode}
               onProximityToggle={setProximityEnabled}
               onReset={resetFilters}

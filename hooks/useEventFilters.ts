@@ -5,6 +5,7 @@ import type { EventDateFilter, EventFilters, EventSortMode } from "@/types/event
 const defaultFilters: EventFilters = {
   category: "all",
   dateFilter: "all",
+  selectedDate: null,
   sortMode: "date",
   proximityEnabled: false,
 };
@@ -18,7 +19,14 @@ export function useEventFilters() {
         setFilters((currentFilters) => ({ ...currentFilters, category }));
       },
       setDateFilter: (dateFilter: EventDateFilter) => {
-        setFilters((currentFilters) => ({ ...currentFilters, dateFilter }));
+        setFilters((currentFilters) => ({ ...currentFilters, dateFilter, selectedDate: null }));
+      },
+      setSelectedDate: (selectedDate: string | null) => {
+        setFilters((currentFilters) => ({
+          ...currentFilters,
+          selectedDate,
+          dateFilter: selectedDate ? "all" : currentFilters.dateFilter,
+        }));
       },
       setSortMode: (sortMode: EventSortMode) => {
         setFilters((currentFilters) => ({

@@ -83,6 +83,7 @@ export interface EventsPage {
 export interface EventFilters {
   category: string;
   dateFilter: EventDateFilter;
+  selectedDate: string | null;
   sortMode: EventSortMode;
   proximityEnabled: boolean;
 }

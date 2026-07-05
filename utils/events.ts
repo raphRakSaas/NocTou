@@ -215,7 +215,7 @@ export function applyEventFilters(
 ): EventItem[] {
   const filteredItems = items
     .filter((item) => matchesCategory(item, filters.category))
-    .filter((item) => matchesDateFilter(item, filters.dateFilter));
+    .filter((item) => matchesDateFilter(item, filters));
 
   return filteredItems.sort((leftItem, rightItem) => {
     if (filters.sortMode === "proximity" && userCoordinates) {
@@ -246,7 +246,13 @@ function matchesCategory(item: EventItem, selectedCategory: string): boolean {
   return item.category === selectedCategory;
 }
 
-function matchesDateFilter(item: EventItem, dateFilter: EventDateFilter): boolean {
+function matchesDateFilter(item: EventItem, filters: EventFilters): boolean {
+  if (filters.selectedDate) {
+    return eventOccursOnDate(item, parseEventDate(filters.selectedDate));
+  }
+
+  const dateFilter = filters.dateFilter;
+
   if (dateFilter === "all") {
     return true;
   }
@@ -256,7 +262,7 @@ function matchesDateFilter(item: EventItem, dateFilter: EventDateFilter): boolea
   const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   if (dateFilter === "today") {
-    return eventDate.getTime() === todayAtMidnight.getTime();
+    return eventOccursOnDate(item, todayAtMidnight);
   }
 
   const numberOfDays = dateFilter === "week" ? 7 : 30;
@@ -264,6 +270,34 @@ function matchesDateFilter(item: EventItem, dateFilter: EventDateFilter): boolea
   endDate.setDate(endDate.getDate() + numberOfDays);
 
   return eventDate >= todayAtMidnight && eventDate <= endDate;
+}
+
+export function eventOccursOnDate(eventItem: EventItem, selectedDate: Date): boolean {
+  const selectedTimestamp = startOfDay(selectedDate).getTime();
+  const startTimestamp = startOfDay(parseEventDate(eventItem.startDate)).getTime();
+  const endTimestamp = eventItem.endDate
+    ? startOfDay(parseEventDate(eventItem.endDate)).getTime()
+    : startTimestamp;
+
+  if (selectedTimestamp >= startTimestamp && selectedTimestamp <= endTimestamp) {
+    return true;
+  }
+
+  return collectEventDates(eventItem).some(
+    (eventDate) => startOfDay(eventDate).getTime() === selectedTimestamp,
+  );
+}
+
+export function toIsoDateString(dateValue: Date): string {
+  const year = dateValue.getFullYear();
+  const month = String(dateValue.getMonth() + 1).padStart(2, "0");
+  const day = String(dateValue.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+export function formatIsoDateLabel(isoDate: string): string {
+  return formatShortFrenchDate(parseEventDate(isoDate));
 }
 
 function toRadians(value: number): number {
