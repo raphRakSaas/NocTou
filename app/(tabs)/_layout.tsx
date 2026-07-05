@@ -1,9 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
+import { FloatingTabBar } from "@/components/FloatingTabBar";
+
 export default function TabsLayout() {
   return (
     <Tabs
+      tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShadowVisible: false,
         headerTitleStyle: {
@@ -17,33 +20,25 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#64748B",
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          position: "absolute",
-          left: 16,
-          right: 16,
-          bottom: 20,
-          height: 76,
-          paddingTop: 7,
-          paddingBottom: 9,
-          paddingHorizontal: 8,
+          height: 64,
+          paddingTop: 6,
+          paddingBottom: 8,
+          paddingHorizontal: 6,
           borderTopWidth: 0,
-          borderRadius: 999,
-          backgroundColor: "#FFFFFF",
-          shadowColor: "#0F172A",
-          shadowOpacity: 0.12,
-          shadowRadius: 16,
-          shadowOffset: { width: 0, height: 8 },
-          elevation: 10,
+          backgroundColor: "transparent",
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarItemStyle: {
           flex: 1,
-          marginHorizontal: 0,
+          marginHorizontal: 2,
           borderRadius: 999,
           overflow: "hidden",
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: "700",
-          marginBottom: 2,
+          marginBottom: 1,
         },
       }}
     >
@@ -56,7 +51,7 @@ export default function TabsLayout() {
             marginTop: 1,
           },
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={20} color={color} />
+            <Ionicons name={focused ? "home" : "home-outline"} size={18} color={color} />
           ),
           tabBarActiveBackgroundColor: "#E2E8F0",
         }}
@@ -70,7 +65,7 @@ export default function TabsLayout() {
             marginTop: 1,
           },
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "map" : "map-outline"} size={20} color={color} />
+            <Ionicons name={focused ? "map" : "map-outline"} size={18} color={color} />
           ),
           tabBarActiveBackgroundColor: "#DBEAFE",
         }}
@@ -84,7 +79,7 @@ export default function TabsLayout() {
             marginTop: 1,
           },
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "heart" : "heart-outline"} size={20} color={color} />
+            <Ionicons name={focused ? "heart" : "heart-outline"} size={18} color={color} />
           ),
           tabBarActiveBackgroundColor: "#FCE7F3",
         }}
