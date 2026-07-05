@@ -17,11 +17,10 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import type { EventItem } from "@/types/event";
 import {
   applyEventFilters,
-  buildCategoryShelves,
+  buildHomeFeedSections,
   collectCategories,
   flattenEventPages,
   getDistanceInKilometers,
-  getUpcomingWeekendEvents,
   prioritizePhotoEvents,
 } from "@/utils/events";
 
@@ -92,12 +91,10 @@ export default function HomeScreen() {
     });
   }, [filters, loadedEvents, searchQuery, userLocation.coordinates]);
   const rankedEvents = useMemo(() => prioritizePhotoEvents(filteredEvents), [filteredEvents]);
-  const popularEvents = useMemo(
-    () => rankedEvents.filter((eventItem) => eventItem.imagePreviewUrl || eventItem.imageUrl).slice(0, 8),
+  const { popularEvents, weekendEvents, categoryShelves } = useMemo(
+    () => buildHomeFeedSections(rankedEvents),
     [rankedEvents],
   );
-  const weekendEvents = useMemo(() => getUpcomingWeekendEvents(rankedEvents), [rankedEvents]);
-  const categoryShelves = useMemo(() => buildCategoryShelves(rankedEvents), [rankedEvents]);
 
   if (eventsQuery.isPending && loadedEvents.length === 0) {
     return <HomeFeedSkeleton />;

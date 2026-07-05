@@ -78,7 +78,7 @@ export function prioritizePhotoEvents(items: EventItem[]): EventItem[] {
   });
 }
 
-export function getUpcomingWeekendEvents(items: EventItem[]): EventItem[] {
+export function getUpcomingWeekendEvents(items: EventItem[], limit = 10): EventItem[] {
   const today = new Date();
   const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const weekendWindowEnd = new Date(todayAtMidnight);
@@ -95,20 +95,74 @@ export function getUpcomingWeekendEvents(items: EventItem[]): EventItem[] {
     );
   });
 
-  return weekendEvents.length > 0 ? weekendEvents : items.slice(0, 10);
+  return weekendEvents.slice(0, limit);
 }
 
-export function buildCategoryShelves(items: EventItem[], maxShelves = 3): CategoryShelf[] {
+export interface HomeFeedSections {
+  popularEvents: EventItem[];
+  weekendEvents: EventItem[];
+  categoryShelves: CategoryShelf[];
+}
+
+export function buildHomeFeedSections(items: EventItem[]): HomeFeedSections {
+  const featuredEventIds = new Set<string>();
+
+  const takeUniqueEvents = (candidates: EventItem[], limit: number): EventItem[] => {
+    const selectedEvents: EventItem[] = [];
+
+    for (const eventItem of candidates) {
+      if (featuredEventIds.has(eventItem.id)) {
+        continue;
+      }
+
+      selectedEvents.push(eventItem);
+      featuredEventIds.add(eventItem.id);
+
+      if (selectedEvents.length >= limit) {
+        break;
+      }
+    }
+
+    return selectedEvents;
+  };
+
+  const popularEvents = takeUniqueEvents(
+    items.filter((eventItem) => eventItem.imagePreviewUrl || eventItem.imageUrl),
+    8,
+  );
+  const weekendEvents = takeUniqueEvents(getUpcomingWeekendEvents(items), 10);
+  const categoryShelves = buildCategoryShelves(
+    items.filter((eventItem) => !featuredEventIds.has(eventItem.id)),
+    3,
+    featuredEventIds,
+  );
+
+  return {
+    popularEvents,
+    weekendEvents,
+    categoryShelves,
+  };
+}
+
+export function buildCategoryShelves(
+  items: EventItem[],
+  maxShelves = 3,
+  featuredEventIds: Set<string> = new Set(),
+): CategoryShelf[] {
   const groupedItems = new Map<string, EventItem[]>();
 
   for (const item of items) {
-    for (const category of splitCategories(item.category)) {
-      if (!groupedItems.has(category)) {
-        groupedItems.set(category, []);
-      }
-
-      groupedItems.get(category)?.push(item);
+    if (featuredEventIds.has(item.id)) {
+      continue;
     }
+
+    const primaryCategory = getPrimaryCategory(item.category);
+
+    if (!groupedItems.has(primaryCategory)) {
+      groupedItems.set(primaryCategory, []);
+    }
+
+    groupedItems.get(primaryCategory)?.push(item);
   }
 
   return [...groupedItems.entries()]
@@ -120,7 +174,16 @@ export function buildCategoryShelves(items: EventItem[], maxShelves = 3): Catego
     .filter((shelf) => shelf.items.length >= 2)
     .sort((leftShelf, rightShelf) => rightShelf.score - leftShelf.score)
     .slice(0, maxShelves)
-    .map(({ title, items: shelfItems }) => ({ title, items: shelfItems }));
+    .map(({ title, items: shelfItems }) => {
+      const uniqueShelfItems = shelfItems.filter((eventItem) => !featuredEventIds.has(eventItem.id)).slice(0, 10);
+
+      for (const eventItem of uniqueShelfItems) {
+        featuredEventIds.add(eventItem.id);
+      }
+
+      return { title, items: uniqueShelfItems };
+    })
+    .filter((shelf) => shelf.items.length >= 2);
 }
 
 export function parseEventDate(dateValue: string): Date {
