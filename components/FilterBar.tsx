@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
+import { getCategoryIcon } from "@/constants/categoryIcons";
 import { GlassSurface } from "@/components/GlassSurface";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventDateFilter, EventFilters, EventSortMode } from "@/types/event";
@@ -79,7 +80,7 @@ export function FilterBar({
           {categories.map((category) => (
             <FilterChip
               key={category}
-              icon="sparkles-outline"
+              icon={getCategoryIcon(category)}
               label={category}
               isActive={filters.category === category}
               onPress={() => onCategoryChange(category)}

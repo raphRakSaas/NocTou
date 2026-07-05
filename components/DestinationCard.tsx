@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image, Pressable, Text, View } from "react-native";
 
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { getCategoryIcon } from "@/constants/categoryIcons";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatDistance } from "@/utils/events";
@@ -47,7 +48,7 @@ export function DestinationCard({
           className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
           style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
         >
-          <Ionicons name="location-outline" size={12} color={colors.text} />
+          <Ionicons name={getCategoryIcon(eventItem.category)} size={12} color={colors.text} />
           <Text className="text-[11px] font-semibold uppercase" style={{ color: colors.text }}>
             {eventItem.category.slice(0, 14)}
           </Text>

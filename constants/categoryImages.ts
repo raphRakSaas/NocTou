@@ -33,18 +33,18 @@ const categoryImageRules: CategoryImageRule[] = [
 const defaultCategoryImageUrl =
   "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=60";
 
+export function normalizeCategoryLabel(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 export function getCategoryFallbackImageUrl(category: string): string {
-  const normalizedCategory = normalizeForMatch(category);
+  const normalizedCategory = normalizeCategoryLabel(category);
   const matchingRule = categoryImageRules.find((rule) =>
     rule.keywords.some((keyword) => normalizedCategory.includes(keyword)),
   );
 
   return matchingRule?.imageUrl ?? defaultCategoryImageUrl;
-}
-
-function normalizeForMatch(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
 }
