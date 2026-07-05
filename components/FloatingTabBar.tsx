@@ -1,6 +1,6 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
@@ -103,26 +103,37 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
               });
             };
 
+            const isActiveWithLabel = isFocused && labelsVisible;
+            const tabItemSize = isActiveWithLabel ? 56 : 48;
+
             return (
               <Pressable
                 key={route.key}
                 accessibilityRole="button"
                 accessibilityState={isFocused ? { selected: true } : {}}
                 accessibilityLabel={options.tabBarAccessibilityLabel ?? label}
-                className="items-center justify-center"
+                android_ripple={
+                  Platform.OS === "android"
+                    ? { color: "rgba(255, 255, 255, 0.18)", borderless: false, foreground: true }
+                    : undefined
+                }
                 hitSlop={tabBarItemHitSlop}
                 onPress={onPress}
                 onLongPress={onLongPress}
+                style={styles.tabPressable}
               >
                 <View
-                  className="items-center justify-center rounded-full"
-                  style={{
-                    backgroundColor: isFocused ? activeBackgroundColor : "transparent",
-                    minWidth: labelsVisible && isFocused ? 92 : 48,
-                    minHeight: labelsVisible && isFocused ? 56 : 48,
-                    paddingHorizontal: labelsVisible && isFocused ? 14 : 12,
-                    paddingVertical: labelsVisible && isFocused ? 8 : 0,
-                  }}
+                  style={[
+                    styles.tabItem,
+                    {
+                      minWidth: isActiveWithLabel ? 92 : tabItemSize,
+                      minHeight: tabItemSize,
+                      paddingHorizontal: isActiveWithLabel ? 14 : 12,
+                      paddingVertical: isActiveWithLabel ? 8 : 0,
+                      borderRadius: tabItemSize / 2,
+                      backgroundColor: isFocused ? activeBackgroundColor : "transparent",
+                    },
+                  ]}
                 >
                   {options.tabBarIcon?.({
                     focused: isFocused,
@@ -131,8 +142,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                   })}
                   {labelsVisible && isFocused ? (
                     <Text
-                      className="mt-1 text-[11px] font-semibold"
-                      style={{ color: activeTintColor }}
+                      style={[styles.tabLabel, { color: activeTintColor }]}
                       numberOfLines={1}
                     >
                       {label}
@@ -170,5 +180,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
+  },
+  tabPressable: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  tabItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  tabLabel: {
+    marginTop: 4,
+    fontSize: 11,
+    fontWeight: "600",
   },
 });
