@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { getFloatingTabBarClearance } from "@/components/FloatingTabBar";
 import { HeaderActions } from "@/components/HeaderActions";
 import { ScreenState } from "@/components/ScreenState";
+import { SortiRoseLogo } from "@/components/SortiRoseLogo";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useTheme } from "@/hooks/useTheme";
 import { prioritizePhotoEvents } from "@/utils/events";
@@ -54,7 +55,8 @@ function FavoritesScreenHeader() {
         className="mb-6 mt-4 rounded-[28px] px-5 py-5"
         style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
       >
-        <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
+        <SortiRoseLogo size={44} showWordmark subtitle="Vos sorties enregistrees" />
+        <Text className="mt-4 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
           Collection
         </Text>
         <Text className="mt-1 text-3xl font-semibold" style={{ color: colors.text }}>

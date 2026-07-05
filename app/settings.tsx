@@ -3,6 +3,7 @@ import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
 import type { ReactNode } from "react";
 
+import { SortiRoseLogo } from "@/components/SortiRoseLogo";
 import { useTheme } from "@/hooks/useTheme";
 
 const datasetUrl =
@@ -20,14 +21,7 @@ export default function SettingsScreen() {
         className="items-center rounded-[32px] px-6 py-8"
         style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
       >
-        <View
-          className="h-20 w-20 items-center justify-center rounded-full"
-          style={{ backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1 }}
-        >
-          <Text className="text-3xl font-bold" style={{ color: colors.text }}>
-            I
-          </Text>
-        </View>
+        <SortiRoseLogo size={80} />
         <Text className="mt-4 text-2xl font-semibold" style={{ color: colors.text }}>
           Parametres
         </Text>

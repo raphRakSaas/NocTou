@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from "r
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
+import { SortiRoseLogo } from "@/components/SortiRoseLogo";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventItem } from "@/types/event";
 import { formatLongDate } from "@/utils/events";
@@ -112,11 +113,26 @@ export function EventDetailHero({
           <DetailRow colors={colors} label="Lieu" value={`${eventItem.venueName}\n${eventItem.address}`} />
           <DetailRow colors={colors} label="Categorie" value={eventItem.category} />
           <DetailRow colors={colors} label="Telephone" value={eventItem.bookingPhone ?? "Non communique"} />
+
+          <View
+            className="mt-8 flex-row items-center gap-3 rounded-[24px] px-4 py-4"
+            style={{ backgroundColor: colors.surfaceMuted, borderColor: colors.border, borderWidth: 1 }}
+          >
+            <SortiRoseLogo size={40} />
+            <View className="flex-1">
+              <Text className="text-sm font-semibold" style={{ color: colors.text }}>
+                Decouvert sur SortiRose
+              </Text>
+              <Text className="mt-1 text-xs leading-5" style={{ color: colors.textMuted }}>
+                Agenda culturel de Toulouse, alimente par les donnees ouvertes de Toulouse Metropole.
+              </Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       <View
-        className="absolute inset-x-0 top-0 px-4"
+        className="absolute inset-x-0 top-0 flex-row items-center justify-between px-4"
         style={{ paddingTop: safeAreaInsets.top + 8 }}
         pointerEvents="box-none"
       >
@@ -133,6 +149,21 @@ export function EventDetailHero({
         >
           <Ionicons name="chevron-back" size={20} color={colors.text} />
         </Pressable>
+
+        <View
+          className="flex-row items-center gap-2 rounded-full px-3 py-1.5"
+          style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderWidth: 1,
+            opacity: 0.94,
+          }}
+        >
+          <SortiRoseLogo size={28} />
+          <Text className="text-sm font-semibold" style={{ color: colors.text }}>
+            SortiRose
+          </Text>
+        </View>
       </View>
 
       <View

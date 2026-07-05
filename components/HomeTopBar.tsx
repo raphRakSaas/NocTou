@@ -1,31 +1,23 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { HeaderActions } from "@/components/HeaderActions";
-import { useTheme } from "@/hooks/useTheme";
+import { SortiRoseLogo } from "@/components/SortiRoseLogo";
+import { SortiRoseWordmark } from "@/components/SortiRoseWordmark";
 
 const headerContentTopSpacing = 8;
+const headerLogoSize = 36;
 
 export function HomeTopBar() {
-  const { colors } = useTheme();
-
   return (
     <SafeAreaView edges={["top"]}>
       <View
-        className="mb-2 flex-row items-center justify-between"
+        className="mb-4 flex-row items-center justify-between"
         style={{ paddingTop: headerContentTopSpacing }}
       >
-        <View className="flex-row items-center gap-2">
-          <Ionicons name="location-outline" size={18} color={colors.accent} />
-          <View>
-            <Text className="text-xs" style={{ color: colors.textMuted }}>
-              Localisation
-            </Text>
-            <Text className="text-lg font-semibold" style={{ color: colors.text }}>
-              Toulouse
-            </Text>
-          </View>
+        <View className="flex-row items-center gap-2.5">
+          <SortiRoseLogo size={headerLogoSize} />
+          <SortiRoseWordmark />
         </View>
         <HeaderActions />
       </View>

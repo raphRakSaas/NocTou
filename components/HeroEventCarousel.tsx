@@ -10,6 +10,7 @@ import {
   type NativeSyntheticEvent,
 } from "react-native";
 
+import { SortiRoseLogo } from "@/components/SortiRoseLogo";
 import type { EventItem } from "@/types/event";
 
 interface HeroEventCarouselProps {
@@ -57,7 +58,13 @@ export function HeroEventCarousel({
   if (heroSlides.length === 0) {
     return (
       <View className="rounded-[32px] bg-slate-950 px-5 pb-5 pt-6">
-        <Text className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">SortiRose</Text>
+        <View className="flex-row items-center gap-3">
+          <SortiRoseLogo size={40} />
+          <View>
+            <Text className="text-lg font-semibold text-white">SortiRose</Text>
+            <Text className="text-sm text-white/70">Toulouse</Text>
+          </View>
+        </View>
         <Text className="mt-3 text-[32px] font-semibold leading-9 text-white">
           Les sorties qui donnent envie de sortir ce soir.
         </Text>
