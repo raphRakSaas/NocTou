@@ -6,7 +6,9 @@ import { parseEventDate } from "@/utils/events";
 
 const toulouseOpenAgendaUid = 42448083;
 const openAgendaPageSize = 300;
-const maxOpenAgendaRequests = 4;
+const maxOpenAgendaRequests = 6;
+const matchingWindowPaddingDays = 3;
+const minimumMatchScore = 7;
 
 const openAgendaApiClient = create({
   baseURL: "https://api.openagenda.com/v2",
@@ -155,7 +157,7 @@ function findBestMatchingOpenAgendaEvent(
       event: openAgendaEvent,
       score: computeMatchScore(eventItem, openAgendaEvent),
     }))
-    .filter((candidate) => candidate.score >= 9)
+    .filter((candidate) => candidate.score >= minimumMatchScore)
     .sort((leftCandidate, rightCandidate) => rightCandidate.score - leftCandidate.score);
 
   return scoredCandidates[0]?.event ?? null;
@@ -215,10 +217,10 @@ function buildMatchingWindow(eventItems: EventItem[]) {
   const earliestDate = new Date(Math.min(...parsedDates.map((parsedDate) => parsedDate.getTime())));
   const latestDate = new Date(Math.max(...parsedDates.map((parsedDate) => parsedDate.getTime())));
 
-  earliestDate.setDate(earliestDate.getDate() - 1);
+  earliestDate.setDate(earliestDate.getDate() - matchingWindowPaddingDays);
   earliestDate.setHours(0, 0, 0, 0);
 
-  latestDate.setDate(latestDate.getDate() + 1);
+  latestDate.setDate(latestDate.getDate() + matchingWindowPaddingDays);
   latestDate.setHours(23, 59, 59, 999);
 
   return {

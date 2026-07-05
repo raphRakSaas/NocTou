@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQueryClient, type InfiniteData } from "@tanstack/r
 import { useEffect, useRef } from "react";
 
 import { enrichEventsWithOpenAgenda } from "@/api/openAgenda";
+import { enrichEventsWithOpenGraphImages } from "@/api/ogImage";
 import { fetchEvents } from "@/api/toulouse";
 import { EVENTS_QUERY_KEY, HOUR_IN_MILLISECONDS } from "@/constants/query";
 import type { EventsPage } from "@/types/event";
@@ -40,27 +41,29 @@ export function useEvents() {
 
     let isCancelled = false;
 
-    void enrichEventsWithOpenAgenda(pendingEvents).then((enrichedEvents) => {
-      if (isCancelled || enrichedEvents.length === 0) {
-        return;
-      }
-
-      const eventsById = new Map(enrichedEvents.map((eventItem) => [eventItem.id, eventItem]));
-
-      queryClient.setQueryData<InfiniteData<EventsPage>>(EVENTS_QUERY_KEY, (currentData) => {
-        if (!currentData) {
-          return currentData;
+    void enrichEventsWithOpenAgenda(pendingEvents)
+      .then((enrichedEvents) => enrichEventsWithOpenGraphImages(enrichedEvents))
+      .then((enrichedEvents) => {
+        if (isCancelled || enrichedEvents.length === 0) {
+          return;
         }
 
-        return {
-          ...currentData,
-          pages: currentData.pages.map((page) => ({
-            ...page,
-            items: page.items.map((eventItem) => eventsById.get(eventItem.id) ?? eventItem),
-          })),
-        };
+        const eventsById = new Map(enrichedEvents.map((eventItem) => [eventItem.id, eventItem]));
+
+        queryClient.setQueryData<InfiniteData<EventsPage>>(EVENTS_QUERY_KEY, (currentData) => {
+          if (!currentData) {
+            return currentData;
+          }
+
+          return {
+            ...currentData,
+            pages: currentData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((eventItem) => eventsById.get(eventItem.id) ?? eventItem),
+            })),
+          };
+        });
       });
-    });
 
     return () => {
       isCancelled = true;

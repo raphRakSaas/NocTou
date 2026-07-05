@@ -1,7 +1,8 @@
 import { Image, Pressable, Text, View } from "react-native";
 
+import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import type { EventItem } from "@/types/event";
-import { formatDistance, getCategoryTint } from "@/utils/events";
+import { formatDistance } from "@/utils/events";
 
 interface EventGridCardProps {
   eventItem: EventItem;
@@ -18,37 +19,24 @@ export function EventGridCard({
   onPress,
   onToggleFavorite,
 }: EventGridCardProps) {
-  const cardImageUrl = eventItem.imagePreviewUrl ?? eventItem.imageUrl;
+  const cardImageUrl =
+    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
 
   return (
     <View className="mb-4 min-h-[326px] flex-1 overflow-hidden rounded-[24px] border border-slate-200 bg-white">
       <Pressable onPress={onPress}>
-        {cardImageUrl ? (
-          <Image
-            source={{ uri: cardImageUrl }}
-            resizeMode="cover"
-            fadeDuration={100}
-            style={{ width: "100%", height: 148 }}
-          />
-        ) : (
-          <View
-            className="h-[148px] justify-end px-4 py-4"
-            style={{ backgroundColor: getCategoryTint(eventItem.category) }}
-          >
-            <Text className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              {eventItem.category}
-            </Text>
-            <Text className="mt-2 text-lg font-semibold leading-6 text-slate-950">{eventItem.title}</Text>
-          </View>
-        )}
+        <Image
+          source={{ uri: cardImageUrl }}
+          resizeMode="cover"
+          fadeDuration={100}
+          style={{ width: "100%", height: 148 }}
+        />
 
         <View className="min-h-[136px] justify-between px-4 py-4">
           <View>
-            {cardImageUrl ? (
-              <Text className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                {eventItem.category}
-              </Text>
-            ) : null}
+            <Text className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              {eventItem.category}
+            </Text>
             <Text className="mt-2 text-base font-semibold leading-6 text-slate-950" numberOfLines={2}>
               {eventItem.title}
             </Text>

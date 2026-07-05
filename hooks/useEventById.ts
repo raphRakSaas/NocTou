@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 
 import { enrichEventsWithOpenAgenda } from "@/api/openAgenda";
+import { enrichEventsWithOpenGraphImages } from "@/api/ogImage";
 import { fetchEventById } from "@/api/toulouse";
 import { EVENTS_QUERY_KEY, HOUR_IN_MILLISECONDS } from "@/constants/query";
 import type { EventItem, EventsPage } from "@/types/event";
@@ -33,13 +34,15 @@ export function useEventById(eventId: string) {
 
     let isCancelled = false;
 
-    void enrichEventsWithOpenAgenda([eventQuery.data]).then(([enrichedEvent]) => {
-      if (isCancelled || !enrichedEvent) {
-        return;
-      }
+    void enrichEventsWithOpenAgenda([eventQuery.data])
+      .then((enrichedEvents) => enrichEventsWithOpenGraphImages(enrichedEvents))
+      .then(([enrichedEvent]) => {
+        if (isCancelled || !enrichedEvent) {
+          return;
+        }
 
-      queryClient.setQueryData([...EVENTS_QUERY_KEY, eventId], enrichedEvent);
-    });
+        queryClient.setQueryData([...EVENTS_QUERY_KEY, eventId], enrichedEvent);
+      });
 
     return () => {
       isCancelled = true;

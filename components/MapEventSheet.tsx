@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
 
+import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import type { EventItem } from "@/types/event";
 
 interface MapEventSheetProps {
@@ -16,23 +17,18 @@ export function MapEventSheet({
   onOpenDirections,
   onShare,
 }: MapEventSheetProps) {
-  const heroImageUrl = eventItem.imagePreviewUrl ?? eventItem.imageUrl;
+  const heroImageUrl =
+    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
 
   return (
     <View className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
       <View className="flex-row gap-4">
-        {heroImageUrl ? (
-          <Image
-            source={{ uri: heroImageUrl }}
-            resizeMode="cover"
-            fadeDuration={100}
-            style={{ width: 88, height: 88, borderRadius: 20 }}
-          />
-        ) : (
-          <View className="h-[88px] w-[88px] items-center justify-center rounded-[20px] bg-slate-100">
-            <Text className="text-xs font-semibold uppercase tracking-wide text-slate-500">Carte</Text>
-          </View>
-        )}
+        <Image
+          source={{ uri: heroImageUrl }}
+          resizeMode="cover"
+          fadeDuration={100}
+          style={{ width: 88, height: 88, borderRadius: 20 }}
+        />
 
         <View className="flex-1">
           <Text className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">

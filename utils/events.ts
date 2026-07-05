@@ -6,8 +6,6 @@ import type {
   EventsPage,
 } from "@/types/event";
 
-const categoryPalette = ["#DBEAFE", "#E0E7FF", "#DCFCE7", "#FCE7F3", "#FEF3C7"];
-
 export function flattenEventPages(pages: EventsPage[] | undefined): EventItem[] {
   return pages?.flatMap((page) => page.items) ?? [];
 }
@@ -160,11 +158,6 @@ export function applyEventFilters(
   });
 }
 
-export function getCategoryTint(category: string): string {
-  const paletteIndex = Math.abs(hashString(category || "sortie")) % categoryPalette.length;
-  return categoryPalette[paletteIndex];
-}
-
 export interface CategoryShelf {
   title: string;
   items: EventItem[];
@@ -196,10 +189,6 @@ function matchesDateFilter(item: EventItem, dateFilter: EventDateFilter): boolea
   endDate.setDate(endDate.getDate() + numberOfDays);
 
   return eventDate >= todayAtMidnight && eventDate <= endDate;
-}
-
-function hashString(value: string): number {
-  return value.split("").reduce((total, character) => total + character.charCodeAt(0), 0);
 }
 
 function toRadians(value: number): number {

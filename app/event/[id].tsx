@@ -3,9 +3,10 @@ import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native"
 
 import { Footer } from "@/components/Footer";
 import { ScreenState } from "@/components/ScreenState";
+import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import { useEventById } from "@/hooks/useEventById";
 import { useFavorites } from "@/hooks/useFavorites";
-import { formatLongDate, getCategoryTint } from "@/utils/events";
+import { formatLongDate } from "@/utils/events";
 
 export default function EventDetailsScreen() {
   const routeParams = useLocalSearchParams<{ id: string }>();
@@ -35,44 +36,30 @@ export default function EventDetailsScreen() {
   }
 
   const eventItem = eventQuery.data;
+  const heroImageUrl =
+    eventItem.imageUrl ?? eventItem.imagePreviewUrl ?? getCategoryFallbackImageUrl(eventItem.category);
 
   return (
     <ScrollView className="flex-1 bg-slate-50" contentContainerStyle={{ paddingBottom: 24 }}>
       <Stack.Screen options={{ title: eventItem.title }} />
 
       <View className="mx-4 mt-4 overflow-hidden rounded-[32px] border border-slate-200 bg-white">
-        {eventItem.imageUrl ? (
-          <Image
-            source={{ uri: eventItem.imageUrl }}
-            resizeMode="cover"
-            fadeDuration={160}
-            style={{ width: "100%", height: 264 }}
-          />
-        ) : (
-          <View
-            className="px-6 py-8"
-            style={{ backgroundColor: getCategoryTint(eventItem.category) }}
-          >
-            <Text className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              {eventItem.category}
-            </Text>
-            <Text className="mt-3 text-3xl font-semibold text-slate-950">{eventItem.title}</Text>
-            <Text className="mt-3 text-base text-slate-700">{eventItem.displayDate}</Text>
-            <Text className="mt-1 text-sm text-slate-700">{eventItem.venueName}</Text>
-          </View>
-        )}
+        <Image
+          source={{ uri: heroImageUrl }}
+          resizeMode="cover"
+          fadeDuration={160}
+          style={{ width: "100%", height: 264 }}
+        />
 
         <View className="gap-6 px-6 py-6">
-          {eventItem.imageUrl ? (
-            <View className="gap-2">
-              <Text className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {eventItem.category}
-              </Text>
-              <Text className="text-3xl font-semibold text-slate-950">{eventItem.title}</Text>
-              <Text className="text-base text-slate-700">{eventItem.displayDate}</Text>
-              <Text className="text-sm text-slate-600">{eventItem.venueName}</Text>
-            </View>
-          ) : null}
+          <View className="gap-2">
+            <Text className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              {eventItem.category}
+            </Text>
+            <Text className="text-3xl font-semibold text-slate-950">{eventItem.title}</Text>
+            <Text className="text-base text-slate-700">{eventItem.displayDate}</Text>
+            <Text className="text-sm text-slate-600">{eventItem.venueName}</Text>
+          </View>
 
           <View className="flex-row flex-wrap gap-3">
             <View className="rounded-full bg-slate-100 px-3 py-2">

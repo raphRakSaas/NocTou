@@ -1,5 +1,6 @@
 import { Image, Pressable, Text, View } from "react-native";
 
+import { getCategoryFallbackImageUrl } from "@/constants/categoryImages";
 import type { EventItem } from "@/types/event";
 
 interface EventRailCardProps {
@@ -8,23 +9,20 @@ interface EventRailCardProps {
 }
 
 export function EventRailCard({ eventItem, onPress }: EventRailCardProps) {
-  const railImageUrl = eventItem.imagePreviewUrl ?? eventItem.imageUrl;
+  const railImageUrl =
+    eventItem.imagePreviewUrl ?? eventItem.imageUrl ?? getCategoryFallbackImageUrl(eventItem.category);
 
   return (
     <Pressable
       className="mr-4 w-[268px] overflow-hidden rounded-[28px] border border-slate-200 bg-white"
       onPress={onPress}
     >
-      {railImageUrl ? (
-        <Image
-          source={{ uri: railImageUrl }}
-          resizeMode="cover"
-          fadeDuration={100}
-          style={{ width: "100%", height: 152 }}
-        />
-      ) : (
-        <View className="h-[152px] bg-slate-100" />
-      )}
+      <Image
+        source={{ uri: railImageUrl }}
+        resizeMode="cover"
+        fadeDuration={100}
+        style={{ width: "100%", height: 152 }}
+      />
 
       <View className="px-4 py-4">
         <Text className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
