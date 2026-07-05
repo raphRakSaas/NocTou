@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
 
-const tabBarHorizontalInset = 40;
+const tabBarHorizontalInset = 28;
 
 export function FloatingTabBar(props: BottomTabBarProps) {
   const safeAreaInsets = useSafeAreaInsets();
