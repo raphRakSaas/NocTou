@@ -159,7 +159,8 @@ Toulouse, sorties, culture, événements, agenda, concerts, expositions, spectac
 ## Contact & crédits
 
 - **Application** : NocTou v1.0.0
-- **Éditeur** : Plum
+- **Éditeur** : Raphaël — projet personnel
+- **Contact** : raphael.rakotonaivo.saas@gmail.com
 - **Données** : Toulouse Métropole — Agenda des manifestations culturelles (So Toulouse)
 - **Licence données** : Open Data (voir fiche dataset pour les conditions d'utilisation)
 

@@ -27,7 +27,7 @@ export default function PrivacyScreen() {
         <LegalBlock
           colors={colors}
           title="Responsable du traitement"
-          description="[A COMPLETER] Raison sociale de l'editeur, adresse, contact : [A COMPLETER - email dedie a la confidentialite]."
+          description="Raphael, developpeur independant, editeur de NocTou a titre personnel et non professionnel. Contact : raphael.rakotonaivo.saas@gmail.com."
         />
         <LegalBlock
           colors={colors}
@@ -58,7 +58,7 @@ export default function PrivacyScreen() {
         <LegalBlock
           colors={colors}
           title="Vos droits"
-          description="Conformement au RGPD, vous disposez d'un droit d'acces, de rectification, d'effacement, de limitation et d'opposition sur vos donnees. Les favoris et le theme etant stockes localement, vous pouvez les effacer directement en supprimant les donnees de l'application depuis les reglages de votre telephone. Pour toute autre demande, contactez [A COMPLETER - email]. Vous pouvez egalement introduire une reclamation aupres de la CNIL."
+          description="Conformement au RGPD, vous disposez d'un droit d'acces, de rectification, d'effacement, de limitation et d'opposition sur vos donnees. Les favoris et le theme etant stockes localement, vous pouvez les effacer directement en supprimant les donnees de l'application depuis les reglages de votre telephone. Pour toute autre demande, contactez raphael.rakotonaivo.saas@gmail.com. Vous pouvez egalement introduire une reclamation aupres de la CNIL."
         />
         <LegalBlock
           colors={colors}

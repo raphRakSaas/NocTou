@@ -18,9 +18,9 @@ export default function TermsScreen() {
           Conditions generales d utilisation
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          NocTou est une application de consultation d evenements culturels a Toulouse, editee par
-          [A COMPLETER - raison sociale]. En utilisant l application, vous acceptez les presentes
-          conditions generales d utilisation (CGU).
+          NocTou est une application de consultation d evenements culturels a Toulouse, developpee
+          et editee a titre personnel par un developpeur independant. En utilisant l application,
+          vous acceptez les presentes conditions generales d utilisation (CGU).
         </Text>
 
         <LegalBlock
@@ -61,7 +61,7 @@ export default function TermsScreen() {
         <LegalBlock
           colors={colors}
           title="Contact"
-          description="Pour toute question relative aux presentes CGU : [A COMPLETER - email de contact]."
+          description="Pour toute question relative aux presentes CGU : raphael.rakotonaivo.saas@gmail.com."
         />
       </View>
     </ScrollView>

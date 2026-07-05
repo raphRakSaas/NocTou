@@ -23,25 +23,18 @@ export default function LegalScreen() {
           Mentions legales
         </Text>
         <Text className="mt-4 text-base leading-7" style={{ color: colors.textMuted }}>
-          Conformement a l article 6-III de la loi n. 2004-575 du 21 juin 2004 pour la confiance
-          dans l economie numerique (LCEN), les presentes mentions legales identifient l editeur
-          de l application NocTou.
+          NocTou est un projet personnel, developpe et publie a titre non professionnel par un
+          developpeur independant. Conformement a l article 6-III de la loi n. 2004-575 du 21 juin
+          2004 pour la confiance dans l economie numerique (LCEN), les editeurs non professionnels
+          peuvent ne pas rendre publiques certaines informations d identification, des lors que
+          celles-ci restent accessibles a l hebergeur ou a la plateforme de distribution.
         </Text>
 
         <View className="mt-6 gap-4">
           <LegalBlock
             colors={colors}
             title="Editeur de l'application"
-            description={
-              "[A COMPLETER] Raison sociale et forme juridique (ex. Plum, SASU au capital de ...), " +
-              "siege social : [A COMPLETER - adresse complete], SIRET : [A COMPLETER], " +
-              "contact : [A COMPLETER - email], telephone : [A COMPLETER]."
-            }
-          />
-          <LegalBlock
-            colors={colors}
-            title="Directeur de la publication"
-            description="[A COMPLETER] Nom et prenom de la personne responsable de la publication."
+            description="Raphael, developpeur independant, editeur non professionnel au sens de la LCEN. Contact : raphael.rakotonaivo.saas@gmail.com."
           />
           <LegalBlock
             colors={colors}
@@ -61,7 +54,7 @@ export default function LegalScreen() {
           <LegalBlock
             colors={colors}
             title="Enrichissement des visuels"
-            description="Certains visuels sont recuperes via l'API OpenAgenda ou, a defaut, extraits automatiquement de la page de reservation du site tiers indique par la source Open Data (recuperation de la miniature publique de la page). L'editeur ne revendique aucun droit sur ces visuels, qui restent la propriete de leurs auteurs ou des organisateurs des evenements. Toute demande de retrait d'un visuel peut etre adressee a [A COMPLETER - email de contact]."
+            description="Certains visuels sont recuperes via l'API OpenAgenda ou, a defaut, extraits automatiquement de la page de reservation du site tiers indique par la source Open Data (recuperation de la miniature publique de la page). L'editeur ne revendique aucun droit sur ces visuels, qui restent la propriete de leurs auteurs ou des organisateurs des evenements. Toute demande de retrait d'un visuel peut etre adressee a raphael.rakotonaivo.saas@gmail.com."
           />
           <LegalBlock
             colors={colors}
