@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -10,8 +10,7 @@ import {
   Text,
   View,
   useWindowDimensions,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
+  type ViewToken,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,12 +28,21 @@ import { prioritizePhotoEvents } from "@/utils/events";
 
 const headerContentTopSpacing = 8;
 const mapHintVisibleDurationMs = 2800;
+const mapOverlayZIndex = {
+  header: 30,
+  hint: 10,
+  carousel: 20,
+} as const;
 
 const toulouseRegion = {
   latitude: 43.6045,
   longitude: 1.444,
   latitudeDelta: 0.18,
   longitudeDelta: 0.18,
+};
+
+const carouselViewabilityConfig = {
+  itemVisiblePercentThreshold: 65,
 };
 
 export default function MapTabContent() {
@@ -63,6 +71,39 @@ export default function MapTabContent() {
     return mapEvents.find((eventItem) => eventItem.id === selectedEventId) ?? null;
   }, [mapEvents, selectedEventId]);
   const carouselCardWidth = Math.max(width - 32, 300);
+  const carouselItemStride = carouselCardWidth + 12;
+
+  const focusMapOnEvent = useCallback((eventItem: EventItem) => {
+    if (!eventItem.coordinates) {
+      return;
+    }
+
+    mapViewRef.current?.animateToRegion(
+      {
+        latitude: eventItem.coordinates.latitude,
+        longitude: eventItem.coordinates.longitude,
+        latitudeDelta: 0.06,
+        longitudeDelta: 0.06,
+      },
+      350,
+    );
+  }, []);
+  const focusMapOnEventRef = useRef(focusMapOnEvent);
+  focusMapOnEventRef.current = focusMapOnEvent;
+
+  const handleCarouselViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken<EventItem>[] }) => {
+      const nextEvent = viewableItems[0]?.item;
+
+      if (!nextEvent) {
+        return;
+      }
+
+      setSelectedEventId((currentEventId) => (currentEventId === nextEvent.id ? currentEventId : nextEvent.id));
+      setIsSheetExpanded(false);
+      focusMapOnEventRef.current(nextEvent);
+    },
+  ).current;
 
   useEffect(() => {
     if (!showMapHint || selectedEventId) {
@@ -155,44 +196,57 @@ export default function MapTabContent() {
           setIsSheetExpanded(false);
         }}
       >
-        {mapEvents.map((eventItem) => (
-          <Marker
-            key={`${eventItem.id}-${selectedEvent?.id === eventItem.id ? "selected" : "default"}`}
-            coordinate={{
-              latitude: eventItem.coordinates!.latitude,
-              longitude: eventItem.coordinates!.longitude,
-            }}
-            pinColor={selectedEvent?.id === eventItem.id ? "#EF4444" : "#2563EB"}
-            title={eventItem.title}
-            description={eventItem.venueName}
-            onPress={(markerEvent) => {
-              markerEvent.stopPropagation?.();
-              setSelectedEventId(eventItem.id);
-              setIsSheetExpanded(false);
-              mapViewRef.current?.animateToRegion(
-                {
-                  latitude: eventItem.coordinates!.latitude,
-                  longitude: eventItem.coordinates!.longitude,
-                  latitudeDelta: 0.06,
-                  longitudeDelta: 0.06,
-                },
-                350,
-              );
+        {mapEvents.map((eventItem) => {
+          const isSelectedMarker = selectedEventId === eventItem.id;
 
-              const nextIndex = mapEvents.findIndex((listedEvent) => listedEvent.id === eventItem.id);
+          return (
+            <Marker
+              key={eventItem.id}
+              identifier={eventItem.id}
+              coordinate={{
+                latitude: eventItem.coordinates!.latitude,
+                longitude: eventItem.coordinates!.longitude,
+              }}
+              pinColor={isSelectedMarker ? "#EF4444" : "#2563EB"}
+              title={eventItem.title}
+              description={eventItem.venueName}
+              onSelect={() => {
+                setSelectedEventId(eventItem.id);
+                setIsSheetExpanded(false);
+                focusMapOnEvent(eventItem);
 
-              if (nextIndex >= 0) {
-                cardsCarouselRef.current?.scrollToIndex({
-                  index: nextIndex,
-                  animated: true,
-                });
-              }
-            }}
-          />
-        ))}
+                const nextIndex = mapEvents.findIndex((listedEvent) => listedEvent.id === eventItem.id);
+
+                if (nextIndex >= 0) {
+                  cardsCarouselRef.current?.scrollToIndex({
+                    index: nextIndex,
+                    animated: true,
+                    viewPosition: 0,
+                  });
+                }
+              }}
+            />
+          );
+        })}
       </MapView>
 
-      <View className="pointer-events-none absolute inset-x-0 top-0">
+      {showMapHint && !selectedEvent ? (
+        <View
+          pointerEvents="none"
+          className="absolute inset-0 items-center justify-center px-8"
+          style={{ zIndex: mapOverlayZIndex.hint }}
+        >
+          <Animated.View style={{ opacity: mapHintOpacity, maxWidth: 320 }}>
+            <MapEphemeralHint />
+          </Animated.View>
+        </View>
+      ) : null}
+
+      <View
+        pointerEvents="box-none"
+        className="absolute inset-x-0 top-0"
+        style={{ zIndex: mapOverlayZIndex.header }}
+      >
         <MapScreenHeader
           loadedCount={mapEvents.length}
           totalCount={totalCount}
@@ -200,21 +254,17 @@ export default function MapTabContent() {
         />
       </View>
 
-      {showMapHint && !selectedEvent ? (
-        <View pointerEvents="none" className="absolute inset-0 items-center justify-center px-8">
-          <Animated.View style={{ opacity: mapHintOpacity, maxWidth: 320 }}>
-            <MapEphemeralHint />
-          </Animated.View>
-        </View>
-      ) : null}
-
       {selectedEvent ? (
-        <View className="absolute inset-x-0" style={{ bottom: mapSheetBottomOffset }}>
+        <View
+          pointerEvents="box-none"
+          className="absolute inset-x-0"
+          style={{ bottom: mapSheetBottomOffset, zIndex: mapOverlayZIndex.carousel }}
+        >
           <FlatList
             ref={cardsCarouselRef}
             data={mapEvents}
             horizontal
-            keyExtractor={(eventItem) => `map-card-${eventItem.id}`}
+            keyExtractor={(eventItem) => eventItem.id}
             renderItem={({ item }) => (
               <View style={{ width: carouselCardWidth, marginRight: 12 }}>
                 <MapEventSheet
@@ -240,33 +290,27 @@ export default function MapTabContent() {
               </View>
             )}
             pagingEnabled
-            snapToInterval={carouselCardWidth + 12}
+            snapToInterval={carouselItemStride}
             decelerationRate="fast"
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16 }}
             getItemLayout={(_, index) => ({
-              length: carouselCardWidth + 12,
-              offset: (carouselCardWidth + 12) * index,
+              length: carouselItemStride,
+              offset: carouselItemStride * index,
               index,
             })}
-            onMomentumScrollEnd={(event) => {
-              const nextIndex = getCarouselIndex(event, carouselCardWidth + 12);
-              const nextEvent = mapEvents[nextIndex];
-
-              if (nextEvent) {
-                setSelectedEventId(nextEvent.id);
-                setIsSheetExpanded(false);
-                mapViewRef.current?.animateToRegion(
-                  {
-                    latitude: nextEvent.coordinates!.latitude,
-                    longitude: nextEvent.coordinates!.longitude,
-                    latitudeDelta: 0.06,
-                    longitudeDelta: 0.06,
-                  },
-                  350,
-                );
-              }
+            initialScrollIndex={Math.max(
+              mapEvents.findIndex((eventItem) => eventItem.id === selectedEvent.id),
+              0,
+            )}
+            onScrollToIndexFailed={({ index }) => {
+              cardsCarouselRef.current?.scrollToOffset({
+                offset: carouselItemStride * index,
+                animated: true,
+              });
             }}
+            onViewableItemsChanged={handleCarouselViewableItemsChanged}
+            viewabilityConfig={carouselViewabilityConfig}
           />
         </View>
       ) : null}
@@ -309,9 +353,10 @@ function MapScreenHeader({ loadedCount, totalCount, isLoadingAll }: MapScreenHea
       };
 
   return (
-    <SafeAreaView edges={["top"]}>
-      <View className="px-4" style={{ paddingTop: headerContentTopSpacing }}>
+    <SafeAreaView edges={["top"]} pointerEvents="box-none">
+      <View className="px-4" pointerEvents="box-none" style={{ paddingTop: headerContentTopSpacing }}>
         <View
+          pointerEvents="box-none"
           className="rounded-[24px] border p-4"
           style={{
             backgroundColor: colors.surface,
@@ -319,8 +364,8 @@ function MapScreenHeader({ loadedCount, totalCount, isLoadingAll }: MapScreenHea
             ...headerShadowStyle,
           }}
         >
-          <View className="flex-row items-start justify-between gap-3">
-            <View className="flex-1">
+          <View pointerEvents="box-none" className="flex-row items-start justify-between gap-3">
+            <View pointerEvents="none" className="flex-1">
               <Text className="text-xl font-semibold" style={{ color: colors.text }}>
                 Carte des sorties
               </Text>
@@ -332,9 +377,7 @@ function MapScreenHeader({ loadedCount, totalCount, isLoadingAll }: MapScreenHea
                 {isLoadingAll ? <ActivityIndicator size="small" color={colors.accent} /> : null}
               </View>
             </View>
-            <View pointerEvents="auto">
-              <HeaderActions />
-            </View>
+            <HeaderActions />
           </View>
         </View>
       </View>
@@ -414,11 +457,4 @@ async function shareEvent(eventItem: EventItem) {
     title: eventItem.title,
     message: parts.join("\n"),
   });
-}
-
-function getCarouselIndex(
-  event: NativeSyntheticEvent<NativeScrollEvent>,
-  itemWidth: number,
-): number {
-  return Math.round(event.nativeEvent.contentOffset.x / itemWidth);
 }
