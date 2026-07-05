@@ -10,10 +10,15 @@ export interface ThemePalette {
   divider: string;
   headerBackground: string;
   statusBarStyle: "light" | "dark";
+  accent: string;
   accentSoft: string;
   accentSoftText: string;
   primaryButton: string;
   primaryButtonText: string;
+  glass: {
+    background: string;
+    border: string;
+  };
   chip: {
     background: string;
     border: string;
@@ -33,8 +38,6 @@ export interface ThemePalette {
     shadow: string;
     activeTint: string;
     inactiveTint: string;
-    activeHome: string;
-    activeMap: string;
-    activeFavorites: string;
+    activeBackground: string;
   };
 }

@@ -13,6 +13,7 @@ export default function TabsLayout() {
       tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShadowVisible: false,
+        headerTransparent: true,
         headerStyle: {
           backgroundColor: colors.headerBackground,
         },
@@ -25,30 +26,23 @@ export default function TabsLayout() {
         sceneStyle: {
           backgroundColor: colors.background,
         },
-        tabBarShowLabel: true,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: colors.tabBar.activeTint,
         tabBarInactiveTintColor: colors.tabBar.inactiveTint,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 64,
-          paddingTop: 6,
+          height: 68,
+          paddingTop: 8,
           paddingBottom: 8,
-          paddingHorizontal: 6,
+          paddingHorizontal: 10,
           borderTopWidth: 0,
           backgroundColor: "transparent",
           elevation: 0,
           shadowOpacity: 0,
         },
         tabBarItemStyle: {
-          flex: 1,
-          marginHorizontal: 2,
           borderRadius: 999,
           overflow: "hidden",
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: "700",
-          marginBottom: 1,
         },
       }}
     >
@@ -56,14 +50,11 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Accueil",
-          headerTitle: "NocTou",
-          tabBarIconStyle: {
-            marginTop: 1,
-          },
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={18} color={color} />
+            <Ionicons name={focused ? "home" : "home-outline"} size={20} color={color} />
           ),
-          tabBarActiveBackgroundColor: colors.tabBar.activeHome,
+          tabBarActiveBackgroundColor: colors.tabBar.activeBackground,
         }}
       />
       <Tabs.Screen
@@ -71,13 +62,10 @@ export default function TabsLayout() {
         options={{
           title: "Carte",
           headerTitle: "Carte des sorties",
-          tabBarIconStyle: {
-            marginTop: 1,
-          },
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "map" : "map-outline"} size={18} color={color} />
+            <Ionicons name={focused ? "map" : "map-outline"} size={20} color={color} />
           ),
-          tabBarActiveBackgroundColor: colors.tabBar.activeMap,
+          tabBarActiveBackgroundColor: colors.tabBar.activeBackground,
         }}
       />
       <Tabs.Screen
@@ -85,13 +73,10 @@ export default function TabsLayout() {
         options={{
           title: "Favoris",
           headerTitle: "Vos favoris",
-          tabBarIconStyle: {
-            marginTop: 1,
-          },
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "heart" : "heart-outline"} size={18} color={color} />
+            <Ionicons name={focused ? "heart" : "heart-outline"} size={20} color={color} />
           ),
-          tabBarActiveBackgroundColor: colors.tabBar.activeFavorites,
+          tabBarActiveBackgroundColor: colors.tabBar.activeBackground,
         }}
       />
     </Tabs>

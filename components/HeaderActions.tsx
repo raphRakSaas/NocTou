@@ -18,7 +18,7 @@ export function HeaderActions({ trailingContent }: HeaderActionsProps) {
       <Pressable
         accessibilityLabel={isDark ? "Activer le mode clair" : "Activer le mode sombre"}
         className="h-9 w-9 items-center justify-center rounded-full"
-        style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+        style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
         onPress={() => void toggleThemeMode()}
       >
         <Ionicons
@@ -33,7 +33,7 @@ export function HeaderActions({ trailingContent }: HeaderActionsProps) {
       >
         <View
           className="h-9 w-9 items-center justify-center rounded-full"
-          style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+          style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
         >
           <Text className="text-sm font-bold" style={{ color: colors.text }}>
             I

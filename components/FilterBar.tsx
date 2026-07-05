@@ -1,5 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
+import { GlassSurface } from "@/components/GlassSurface";
 import { useTheme } from "@/hooks/useTheme";
 import type { EventDateFilter, EventFilters, EventSortMode } from "@/types/event";
 
@@ -13,16 +15,16 @@ interface FilterBarProps {
   onReset: () => void;
 }
 
-const dateOptions: { label: string; value: EventDateFilter }[] = [
-  { label: "Toutes les dates", value: "all" },
-  { label: "Aujourd'hui", value: "today" },
-  { label: "7 jours", value: "week" },
-  { label: "30 jours", value: "month" },
+const dateOptions: { label: string; value: EventDateFilter; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { label: "Toutes", value: "all", icon: "apps-outline" },
+  { label: "Aujourd'hui", value: "today", icon: "today-outline" },
+  { label: "7 jours", value: "week", icon: "calendar-outline" },
+  { label: "30 jours", value: "month", icon: "calendar-number-outline" },
 ];
 
-const sortOptions: { label: string; value: EventSortMode }[] = [
-  { label: "Par date", value: "date" },
-  { label: "Par proximite", value: "proximity" },
+const sortOptions: { label: string; value: EventSortMode; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { label: "Date", value: "date", icon: "time-outline" },
+  { label: "Proche", value: "proximity", icon: "navigate-outline" },
 ];
 
 export function FilterBar({
@@ -34,35 +36,14 @@ export function FilterBar({
   onProximityToggle,
   onReset,
 }: FilterBarProps) {
-  const { colors } = useTheme();
-
   return (
     <View className="gap-3">
-      <View className="flex-row items-center justify-between px-1">
-        <View>
-          <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
-            Explorer
-          </Text>
-          <Text className="mt-1 text-lg font-semibold" style={{ color: colors.text }}>
-            Filtres rapides
-          </Text>
-        </View>
-        <Pressable
-          className="rounded-full px-4 py-2"
-          style={{ backgroundColor: colors.primaryButton }}
-          onPress={onReset}
-        >
-          <Text className="text-sm font-semibold" style={{ color: colors.primaryButtonText }}>
-            Reset
-          </Text>
-        </Pressable>
-      </View>
-
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-2 pr-4">
           {sortOptions.map((option) => (
             <FilterChip
               key={option.value}
+              icon={option.icon}
               label={option.label}
               isActive={filters.sortMode === option.value}
               onPress={() => onSortModeChange(option.value)}
@@ -71,22 +52,26 @@ export function FilterBar({
           {dateOptions.map((option) => (
             <FilterChip
               key={option.value}
+              icon={option.icon}
               label={option.label}
               isActive={filters.dateFilter === option.value}
               onPress={() => onDateFilterChange(option.value)}
             />
           ))}
           <FilterChip
-            label={filters.proximityEnabled ? "Proximite active" : "Proximite"}
+            icon="locate-outline"
+            label={filters.proximityEnabled ? "Proche actif" : "Proche"}
             isActive={filters.proximityEnabled}
             onPress={() => onProximityToggle(!filters.proximityEnabled)}
           />
+          <FilterChip icon="refresh-outline" label="Reset" isActive={false} onPress={onReset} />
         </View>
       </ScrollView>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-2 pr-4">
           <FilterChip
+            icon="grid-outline"
             label="Toutes"
             isActive={filters.category === "all"}
             onPress={() => onCategoryChange("all")}
@@ -94,6 +79,7 @@ export function FilterBar({
           {categories.map((category) => (
             <FilterChip
               key={category}
+              icon="sparkles-outline"
               label={category}
               isActive={filters.category === category}
               onPress={() => onCategoryChange(category)}
@@ -107,28 +93,32 @@ export function FilterBar({
 
 interface FilterChipProps {
   label: string;
+  icon: keyof typeof Ionicons.glyphMap;
   isActive: boolean;
   onPress: () => void;
 }
 
-function FilterChip({ label, isActive, onPress }: FilterChipProps) {
+function FilterChip({ label, icon, isActive, onPress }: FilterChipProps) {
   const { colors } = useTheme();
 
   return (
-    <Pressable
-      className="rounded-full border px-4 py-2"
-      style={{
-        backgroundColor: isActive ? colors.chip.activeBackground : colors.chip.background,
-        borderColor: isActive ? colors.chip.activeBackground : colors.chip.border,
-      }}
-      onPress={onPress}
-    >
-      <Text
-        className="text-sm font-medium"
-        style={{ color: isActive ? colors.chip.activeText : colors.chip.text }}
-      >
-        {label}
-      </Text>
+    <Pressable onPress={onPress}>
+      <GlassSurface borderRadius={999}>
+        <View
+          className="flex-row items-center gap-2 px-4 py-2.5"
+          style={{
+            backgroundColor: isActive ? colors.chip.activeBackground : "transparent",
+          }}
+        >
+          <Ionicons name={icon} size={14} color={isActive ? colors.chip.activeText : colors.textMuted} />
+          <Text
+            className="text-sm font-medium"
+            style={{ color: isActive ? colors.chip.activeText : colors.text }}
+          >
+            {label}
+          </Text>
+        </View>
+      </GlassSurface>
     </Pressable>
   );
 }

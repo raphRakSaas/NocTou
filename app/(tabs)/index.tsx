@@ -1,14 +1,14 @@
 import { router } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 
-import { EventCard } from "@/components/EventCard";
-import { EventRailCard } from "@/components/EventRailCard";
+import { DestinationCard } from "@/components/DestinationCard";
 import { FilterBar } from "@/components/FilterBar";
 import { Footer } from "@/components/Footer";
-import { HeroEventCarousel } from "@/components/HeroEventCarousel";
+import { HomeTopBar } from "@/components/HomeTopBar";
 import { HomeFeedSkeleton } from "@/components/HomeFeedSkeleton";
 import { ScreenState } from "@/components/ScreenState";
+import { SearchBar } from "@/components/SearchBar";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useEvents } from "@/hooks/useEvents";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -24,12 +24,43 @@ import {
   prioritizePhotoEvents,
 } from "@/utils/events";
 
+function SectionHeader({
+  eyebrow,
+  title,
+  actionLabel,
+}: {
+  eyebrow: string;
+  title: string;
+  actionLabel?: string;
+}) {
+  const { colors } = useTheme();
+
+  return (
+    <View className="mb-3 flex-row items-end justify-between px-1">
+      <View>
+        <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
+          {eyebrow}
+        </Text>
+        <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
+          {title}
+        </Text>
+      </View>
+      {actionLabel ? (
+        <Text className="text-sm font-medium" style={{ color: colors.accentSoftText }}>
+          {actionLabel}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const { colors } = useTheme();
+  const [searchQuery, setSearchQuery] = useState("");
   const eventsQuery = useEvents();
   const { filters, resetFilters, setCategory, setDateFilter, setProximityEnabled, setSortMode } =
     useEventFilters();
-  const { favoriteEvents, isFavorite, isReady, toggleFavorite } = useFavorites();
+  const { isFavorite, isReady, toggleFavorite } = useFavorites();
   const userLocation = useUserLocation(filters.proximityEnabled);
 
   const loadedEvents = useMemo(
@@ -37,12 +68,21 @@ export default function HomeScreen() {
     [eventsQuery.data?.pages],
   );
   const availableCategories = useMemo(() => collectCategories(loadedEvents), [loadedEvents]);
-  const filteredEvents = useMemo(
-    () => applyEventFilters(loadedEvents, filters, userLocation.coordinates),
-    [filters, loadedEvents, userLocation.coordinates],
-  );
+  const filteredEvents = useMemo(() => {
+    const baseEvents = applyEventFilters(loadedEvents, filters, userLocation.coordinates);
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return baseEvents;
+    }
+
+    return baseEvents.filter((eventItem) => {
+      const searchableText = `${eventItem.title} ${eventItem.category} ${eventItem.venueName}`.toLowerCase();
+      return searchableText.includes(normalizedQuery);
+    });
+  }, [filters, loadedEvents, searchQuery, userLocation.coordinates]);
   const rankedEvents = useMemo(() => prioritizePhotoEvents(filteredEvents), [filteredEvents]);
-  const featuredEvents = useMemo(
+  const popularEvents = useMemo(
     () => rankedEvents.filter((eventItem) => eventItem.imagePreviewUrl || eventItem.imageUrl).slice(0, 8),
     [rankedEvents],
   );
@@ -67,11 +107,12 @@ export default function HomeScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <FlatList
-        data={filteredEvents}
+        data={rankedEvents}
         keyExtractor={(eventItem) => eventItem.id}
         renderItem={({ item }) => (
-          <EventCard
+          <DestinationCard
             eventItem={item}
+            variant="wide"
             distanceInKilometers={
               filters.proximityEnabled
                 ? getDistanceInKilometers(userLocation.coordinates, item.coordinates)
@@ -86,15 +127,11 @@ export default function HomeScreen() {
             }}
           />
         )}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 136 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 136 }}
         ListHeaderComponent={
           <View className="mb-6 gap-5">
-            <HeroEventCarousel
-              eventItems={featuredEvents}
-              favoriteCount={favoriteEvents.length}
-              onPressEvent={(eventItem) => router.push(`/event/${eventItem.id}`)}
-            />
-
+            <HomeTopBar />
+            <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
             <FilterBar
               categories={availableCategories}
               filters={filters}
@@ -106,11 +143,9 @@ export default function HomeScreen() {
             />
 
             {filters.proximityEnabled && userLocation.errorMessage ? (
-              <View className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <Text className="text-sm font-semibold text-amber-900">Localisation indisponible</Text>
-                <Text className="mt-1 text-sm leading-5 text-amber-800">
-                  {userLocation.errorMessage}
-                </Text>
+              <View className="rounded-2xl border border-amber-300/40 bg-amber-500/10 px-4 py-3">
+                <Text className="text-sm font-semibold text-amber-100">Localisation indisponible</Text>
+                <Text className="mt-1 text-sm leading-5 text-amber-100/80">{userLocation.errorMessage}</Text>
               </View>
             ) : null}
 
@@ -119,35 +154,55 @@ export default function HomeScreen() {
                 className="flex-row items-center gap-3 rounded-2xl px-4 py-3"
                 style={{ backgroundColor: colors.accentSoft }}
               >
-                <ActivityIndicator size="small" color={colors.accentSoftText} />
+                <ActivityIndicator size="small" color={colors.accent} />
                 <Text className="text-sm" style={{ color: colors.accentSoftText }}>
                   Recherche de votre position...
                 </Text>
               </View>
             ) : null}
 
-            {weekendEvents.length > 0 ? (
-              <View className="gap-3">
-                <View className="flex-row items-end justify-between px-1">
-                  <View>
-                    <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
-                      Ce week-end
-                    </Text>
-                    <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
-                      Les sorties qui arrivent
-                    </Text>
-                  </View>
-                  <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
-                    Scroll horizontal
-                  </Text>
-                </View>
+            {popularEvents.length > 0 ? (
+              <View>
+                <SectionHeader
+                  eyebrow="Selection"
+                  title="Sorties populaires"
+                  actionLabel="Voir tout"
+                />
+                <FlatList
+                  data={popularEvents}
+                  horizontal
+                  keyExtractor={(eventItem) => `popular-${eventItem.id}`}
+                  renderItem={({ item }) => (
+                    <DestinationCard
+                      eventItem={item}
+                      distanceInKilometers={
+                        filters.proximityEnabled
+                          ? getDistanceInKilometers(userLocation.coordinates, item.coordinates)
+                          : null
+                      }
+                      isFavorite={isFavorite(item.id)}
+                      onPress={() => router.push(`/event/${item.id}`)}
+                      onToggleFavorite={() => {
+                        if (isReady) {
+                          void toggleFavorite(item);
+                        }
+                      }}
+                    />
+                  )}
+                  showsHorizontalScrollIndicator={false}
+                />
+              </View>
+            ) : null}
 
+            {weekendEvents.length > 0 ? (
+              <View>
+                <SectionHeader eyebrow="Ce week-end" title="Les sorties qui arrivent" />
                 <FlatList
                   data={weekendEvents}
                   horizontal
                   keyExtractor={(eventItem) => `weekend-${eventItem.id}`}
                   renderItem={({ item }) => (
-                    <EventRailCard
+                    <DestinationCard
                       eventItem={item}
                       onPress={() => router.push(`/event/${item.id}`)}
                     />
@@ -158,27 +213,14 @@ export default function HomeScreen() {
             ) : null}
 
             {categoryShelves.map((shelf) => (
-              <View key={shelf.title} className="gap-3">
-                <View className="flex-row items-end justify-between px-1">
-                  <View>
-                    <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
-                      Categorie
-                    </Text>
-                    <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
-                      {shelf.title}
-                    </Text>
-                  </View>
-                  <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
-                    {shelf.items.length} sorties
-                  </Text>
-                </View>
-
+              <View key={shelf.title}>
+                <SectionHeader eyebrow="Categorie" title={shelf.title} actionLabel={`${shelf.items.length} sorties`} />
                 <FlatList
                   data={shelf.items}
                   horizontal
                   keyExtractor={(eventItem) => `${shelf.title}-${eventItem.id}`}
                   renderItem={({ item }) => (
-                    <EventRailCard
+                    <DestinationCard
                       eventItem={item}
                       onPress={() => router.push(`/event/${item.id}`)}
                     />
@@ -188,19 +230,7 @@ export default function HomeScreen() {
               </View>
             ))}
 
-            <View className="flex-row items-end justify-between px-1">
-              <View>
-                <Text className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: colors.textMuted }}>
-                  Explorer
-                </Text>
-                <Text className="mt-1 text-xl font-semibold" style={{ color: colors.text }}>
-                  Toutes les sorties
-                </Text>
-              </View>
-              <Text className="text-sm font-medium" style={{ color: colors.textMuted }}>
-                1 evenement par ligne
-              </Text>
-            </View>
+            <SectionHeader eyebrow="Explorer" title="Toutes les sorties" />
           </View>
         }
         ListEmptyComponent={
@@ -216,16 +246,14 @@ export default function HomeScreen() {
             {eventsQuery.hasNextPage ? (
               <Pressable
                 className="mb-4 items-center rounded-full px-5 py-4"
-                style={{ backgroundColor: colors.primaryButton }}
+                style={{ backgroundColor: colors.accent }}
                 disabled={eventsQuery.isFetchingNextPage}
                 onPress={() => void eventsQuery.fetchNextPage()}
               >
                 {eventsQuery.isFetchingNextPage ? (
-                  <ActivityIndicator size="small" color={colors.primaryButtonText} />
+                  <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
-                  <Text className="font-semibold" style={{ color: colors.primaryButtonText }}>
-                    Charger plus de sorties
-                  </Text>
+                  <Text className="font-semibold text-white">Charger plus de sorties</Text>
                 )}
               </Pressable>
             ) : null}
@@ -239,8 +267,8 @@ export default function HomeScreen() {
         }}
         onEndReachedThreshold={0.6}
         removeClippedSubviews
-        initialNumToRender={6}
-        maxToRenderPerBatch={8}
+        initialNumToRender={4}
+        maxToRenderPerBatch={6}
         updateCellsBatchingPeriod={40}
         windowSize={7}
         showsVerticalScrollIndicator={false}
