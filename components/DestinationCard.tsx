@@ -82,15 +82,10 @@ export function DestinationCard({
           )}
         </View>
 
-        <View
-          className="mt-4 flex-row items-center justify-between rounded-full px-4 py-3"
-          style={{ backgroundColor: colors.glass.background, borderColor: colors.glass.border, borderWidth: 1 }}
-        >
-          <Text className="text-sm font-semibold" style={{ color: colors.text }}>
-            Explorer
-          </Text>
+        <View className="mt-3 flex-row items-center justify-end gap-2">
+          <Text className="text-sm font-medium text-white/85">Explorer</Text>
           <View className="h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: colors.accent }}>
-            <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
+            <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
           </View>
         </View>
       </View>
